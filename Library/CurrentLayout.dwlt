@@ -20,7 +20,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 2}
-  m_MinSize: {x: 950, y: 392}
+  m_MinSize: {x: 950, y: 542}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &2
 MonoBehaviour:
@@ -106,8 +106,8 @@ MonoBehaviour:
     y: 30
     width: 1920
     height: 947
-  m_MinSize: {x: 683, y: 342}
-  m_MaxSize: {x: 12008, y: 8042}
+  m_MinSize: {x: 683, y: 492}
+  m_MaxSize: {x: 14004, y: 14042}
   vertical: 0
   controlID: 9
 --- !u!114 &6
@@ -130,8 +130,8 @@ MonoBehaviour:
     y: 0
     width: 1422
     height: 947
-  m_MinSize: {x: 406, y: 342}
-  m_MaxSize: {x: 8006, y: 8042}
+  m_MinSize: {x: 406, y: 492}
+  m_MaxSize: {x: 10002, y: 14042}
   vertical: 1
   controlID: 10
 --- !u!114 &7
@@ -228,14 +228,14 @@ MonoBehaviour:
     y: 536
     width: 1422
     height: 411
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
-  m_ActualView: {fileID: 16}
+  m_MinSize: {x: 232, y: 271}
+  m_MaxSize: {x: 10002, y: 10021}
+  m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 16}
   - {fileID: 17}
-  m_Selected: 0
-  m_LastSelected: 1
+  m_Selected: 1
+  m_LastSelected: 0
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -365,9 +365,9 @@ MonoBehaviour:
     height: 515
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 202a0000
-    m_LastClickedID: 10784
-    m_ExpandedIDs: 5022f4ff8cfef5ff600cf6ff262ffaffe2fbffff000000001a2a0000
+    m_SelectedIDs: 74260000
+    m_LastClickedID: 0
+    m_ExpandedIDs: 742bfcff660ffeff4e1ffeff501ffeff561ffeff581ffeffe4fbffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: GameObject
@@ -386,7 +386,7 @@ MonoBehaviour:
       m_ClientGUIView: {fileID: 8}
     m_SearchString: 
   m_ExpandedScenes:
-  - BoardGen
+  - VrTestScene
   m_CurrenRootInstanceID: 0
   m_Locked: 0
   m_CurrentSortingName: TransformSorting
@@ -417,14 +417,14 @@ MonoBehaviour:
     width: 1032
     height: 515
   m_SceneLighting: 1
-  lastFramingTime: 3521.3626297253154
+  lastFramingTime: 38.225937218665784
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -38.39568, y: 0, z: -1.8070589}
+    m_Target: {x: 1.3472675, y: 0.9001808, z: -7.24}
     speed: 2
-    m_Value: {x: -38.39568, y: 0, z: -1.8070589}
+    m_Value: {x: 1.3472675, y: 0.9001808, z: -7.24}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -451,9 +451,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: -0.5565716, y: -0.19365187, z: 0.13531795, w: -0.7965024}
   m_Size:
-    m_Target: 264.72974
+    m_Target: 148.44302
     speed: 2
-    m_Value: 264.72974
+    m_Value: 148.44302
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -553,18 +553,18 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Resources/Scripts
+    - Assets/Resources/Scenes
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Resources/Scripts
+  - Assets/Resources/Scenes
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\Home\Desktop\GameJam2017Spring
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: a0260000
-    m_LastClickedID: 9888
+    m_SelectedIDs: 4c260000
+    m_LastClickedID: 9804
     m_ExpandedIDs: 00000000bc25000010270000282700005a2a000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -618,8 +618,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 202a0000
-    m_LastClickedInstanceID: 10784
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: d0210000022600009a26000050caffff00000000aa260000a02600004c2b0000
     m_RenameOverlay:
