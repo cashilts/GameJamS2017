@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour {
 
-    const float tileWidth = 1.7f;
-    const float tileHeight = 1.5f;
-    public int boardSize = 100;
+    public const float tileWidth = 1.7f;
+    public const float tileHeight = 1.5f;
+    public const int boardSize = 100;
 
 	// Use this for initialization
 	void Start () {
@@ -15,8 +15,9 @@ public class BoardManager : MonoBehaviour {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++){
                 GameObject newTile = GameObject.Instantiate(newTile = (GameObject)Resources.Load("Prefabs/DeepWaterTex"));
-                newTile.name = "tile" + j + i;
+                newTile.name = "tile" + j + "," + i;
                 newTile.transform.position = new Vector3(startX + (tileWidth * j), 0, startY + (tileHeight * i));
+                newTile.transform.parent = this.transform;
             }
             if (i % 2 == 0){
                 startX -= tileWidth / 2;
