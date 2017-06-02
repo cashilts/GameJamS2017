@@ -85,7 +85,7 @@ public class TileWrapper : MonoBehaviour {
             for (int i = 0; i < BoardManager.boardSize; i++)
             {
                 GameObject tileToShift = boardReferance[i][actualShift - tileSelect];
-                tileToShift.transform.Translate(0,0, BoardManager.boardSize * BoardManager.tileHeight);
+                tileToShift.transform.Translate(0,0, BoardManager.boardSize * BoardManager.tileHeight*direction);
             }
         }
         else if (actualShift < 0)
@@ -93,7 +93,7 @@ public class TileWrapper : MonoBehaviour {
             for (int i = 0; i < BoardManager.boardSize; i++)
             {
                 GameObject tileToShift = boardReferance[i][BoardManager.boardSize + actualShift - tileSelect];
-                tileToShift.transform.Translate(0,0, BoardManager.boardSize * BoardManager.tileHeight);
+                tileToShift.transform.Translate(0,0, BoardManager.boardSize * BoardManager.tileHeight*direction);
             }
         }
         else
@@ -103,7 +103,7 @@ public class TileWrapper : MonoBehaviour {
                 for (int i = 0; i < BoardManager.boardSize; i++)
                 {
                     GameObject tileToShift = boardReferance[i][0];
-                    tileToShift.transform.Translate(0, 0,BoardManager.boardSize * BoardManager.tileHeight);
+                    tileToShift.transform.Translate(0, 0,BoardManager.boardSize * BoardManager.tileHeight*direction);
                 }
             }
             else
@@ -111,7 +111,7 @@ public class TileWrapper : MonoBehaviour {
                 for (int i = 0; i < BoardManager.boardSize; i++)
                 {
                     GameObject tileToShift = boardReferance[BoardManager.boardSize - 1][i];
-                    tileToShift.transform.Translate(0, 0, BoardManager.boardSize * BoardManager.tileHeight);
+                    tileToShift.transform.Translate(0, 0, BoardManager.boardSize * BoardManager.tileHeight*direction);
                 }
             }
         }
