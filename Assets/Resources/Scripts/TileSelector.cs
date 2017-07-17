@@ -12,7 +12,6 @@ public class TileSelector : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         Vector3 fwd = transform.TransformDirection(transform.forward);
-        Debug.Log(fwd);
         RaycastHit hit;
         if (Physics.Raycast(transform.position, fwd,out hit, 30)) {
             Debug.DrawLine(transform.position, hit.point);

@@ -7,6 +7,7 @@ public class BoardManager : MonoBehaviour {
     public const float tileWidth = 1.7f;
     public const float tileHeight = 1.5f;
     public const int boardSize = 100;
+    int grassTiles = 0;
     Tile[,] board = new Tile[boardSize,boardSize];  
 
 	// Use this for initialization
@@ -34,13 +35,33 @@ public class BoardManager : MonoBehaviour {
         GenerateIce(iceX, boardSize - 1, 100);
 
         int continentP = 100;
-        while (Random.Range(0, 100) <= continentP) {
-            int x = (int)Random.Range(boardSize * 0.3f, boardSize * 0.7f);
-            int y = (int)Random.Range(0, boardSize-1);
-            if (board[x, y].setType == Tile.tileType.DeepWater) {
-                GenerateContinent(x, y, continentP);
-                continentP -= 21;
+        int continentNum = 1;
+        int continentMax = 1;
+        Debug.Log("StartGen");
+        while (grassTiles <(boardSize * boardSize * 0.35))
+        {
+            Debug.Log("Not enough Grass");
+            while (Random.Range(0, 100) <= continentP)
+            {
+                Debug.Log("Making " + continentNum + " continents");
+                while (continentNum != 0)
+                {
+                    int x = (int)Random.Range(0, boardSize-1);
+                    int y = (int)Random.Range(0, boardSize - 1);
+                    if (board[x, y].setType == Tile.tileType.DeepWater)
+                    {
+                        GenerateContinent(x, y, continentP);
+                        continentNum--;
+                    }
+                }
+                if (Random.Range(0, 100) <= 100 - continentP)
+                {
+                    continentMax++;
+                }
+                continentNum = continentMax;
+                continentP -= 12;
             }
+            continentP += 3;
         }
 	}
 	
@@ -49,34 +70,51 @@ public class BoardManager : MonoBehaviour {
 	}
 
     void GenerateContinent(int x, int y, float p){
+        grassTiles++;
         board[x, y].setType = Tile.tileType.Grass;
         board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/GrassTex");
         if (Random.Range(0, 100) <= p)
         {
             if (x - 1 >= 0)
             {
-                if (board[x - 1, y].setType == Tile.tileType.DeepWater ) GenerateContinent(x - 1, y, p - 0.21f);
+                if (board[x - 1, y].setType == Tile.tileType.DeepWater ) GenerateContinent(x - 1, y, p - 0.81f);
+            }
+            else
+            {
+                if (board[boardSize-1, y].setType == Tile.tileType.DeepWater) GenerateContinent(boardSize-1, y, p - 0.81f);
             }
         }
         if (Random.Range(0, 100) <= p)
         {
             if (x + 1 <= boardSize - 1)
             {
-                if (board[x + 1, y].setType == Tile.tileType.DeepWater) GenerateContinent(x + 1, y, p - 0.22f);
+                if (board[x + 1, y].setType == Tile.tileType.DeepWater) GenerateContinent(x + 1, y, p - 0.62f);
+            }
+            else
+            {
+                if (board[0, y].setType == Tile.tileType.DeepWater) GenerateContinent(0, y, p - 0.62f);
             }
         }
         if (Random.Range(0, 100) <= p)
         {
             if (y + 1 <= boardSize - 1)
             {
-                if (board[x, y + 1].setType == Tile.tileType.DeepWater) GenerateContinent(x, y + 1, p - 0.25f);
+                if (board[x, y + 1].setType == Tile.tileType.DeepWater) GenerateContinent(x, y + 1, p - 0.79f);
+            }
+            else
+            {
+                if (board[x, 0].setType == Tile.tileType.DeepWater) GenerateContinent(x, 0, p - 0.79f);
             }
         }
         if (Random.Range(0, 100) <= p)
         {
             if (y - 1 >= 0)
             {
-                if (board[x, y - 1].setType == Tile.tileType.DeepWater) GenerateContinent(x, y - 1, p - 0.20f);
+                if (board[x, y - 1].setType == Tile.tileType.DeepWater) GenerateContinent(x, y - 1, p - 0.70f);
+            }
+            else
+            {
+                if (board[x, boardSize-1].setType == Tile.tileType.DeepWater) GenerateContinent(x, boardSize-1, p - 0.70f);
             }
         }
     }
@@ -87,23 +125,31 @@ public class BoardManager : MonoBehaviour {
         if (Random.Range(0, 100) <= p)
         {
             if (x - 1 >= 0) {
-                if (board[x - 1, y].setType != Tile.tileType.Ice) GenerateIce(x - 1, y, p - 0.19f);
+                if (board[x - 1, y].setType != Tile.tileType.Ice) GenerateIce(x - 1, y, p - 0.005f);
+            }
+            else
+            {
+                if (board[boardSize - 1, y].setType != Tile.tileType.Ice) GenerateIce(boardSize - 1, y, p - 0.005f);
             }
         }
         if (Random.Range(0, 100) <= p)
         {
-            if (x + 1 <= boardSize-1) {
-                if (board[x + 1, y].setType != Tile.tileType.Ice) GenerateIce(x + 1, y, p - 0.19f);
+            if (x + 1 <= boardSize-1 ) {
+                if (board[x + 1, y].setType != Tile.tileType.Ice) GenerateIce(x + 1, y, p - 0.005f);
+            }
+            else
+            {
+                if (board[0, y].setType != Tile.tileType.Ice) GenerateIce(0, y, p - 0.005f);
             }
         }
         if (Random.Range(0, 100) <= p) {
             if (y + 1 <= boardSize - 1){
-                if (board[x, y + 1].setType != Tile.tileType.Ice) GenerateIce(x, y + 1, p - 10);
+                if (board[x, y + 1].setType != Tile.tileType.Ice) GenerateIce(x, y + 1, p - 15);
             }
         }
         if (Random.Range(0, 100) <= p) {
             if (y - 1 >= 0) {
-                if (board[x, y - 1].setType != Tile.tileType.Ice) GenerateIce(x, y - 1, p-5);
+                if (board[x, y - 1].setType != Tile.tileType.Ice) GenerateIce(x, y - 1, p-15);
             }
         }
     }
