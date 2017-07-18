@@ -12,6 +12,6 @@ public class CameraController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        transform.Translate(leftController.controllerState.rAxis0.x*scrollRate, leftController.controllerState.rAxis0.y*scrollRate, 0);
+        transform.Translate(leftController.controllerState.rAxis0.y * scrollRate, 0, -leftController.controllerState.rAxis0.x * scrollRate);
 	}
 }
