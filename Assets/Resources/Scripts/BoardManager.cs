@@ -63,6 +63,63 @@ public class BoardManager : MonoBehaviour {
             }
             continentP += 3;
         }
+
+        for (int x = 0; x < boardSize; x++) {
+            for (int y = 0; y < boardSize; y++) {
+                if (board[x, y].setType == Tile.tileType.DeepWater) {
+                    int xPlus = (x + 1 < boardSize) ? (x + 1) : 0;
+                    int xMinus = (x - 1 >= 0) ? (x - 1) : (boardSize - 1);
+                    int yPlus = (y + 1 < boardSize) ? (y + 1) : 0;
+                    int yMinus = (y - 1 >= 0) ? (y - 1) : (boardSize - 1);
+
+                    if (board[xMinus, y].setType == Tile.tileType.Grass)
+                    {
+                        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                        board[x, y].setType = Tile.tileType.ShallowWater;
+                    }
+                    else if (board[xPlus, y].setType == Tile.tileType.Grass)
+                    {
+                        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                        board[x, y].setType = Tile.tileType.ShallowWater;
+                    }
+                    else if (board[x, yPlus].setType == Tile.tileType.Grass)
+                    {
+                        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                        board[x, y].setType = Tile.tileType.ShallowWater;
+                    }
+                    else if (board[x, yMinus].setType == Tile.tileType.Grass)
+                    {
+                        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                        board[x, y].setType = Tile.tileType.ShallowWater;
+                    }
+                    else if (x % 2 == 1) {
+                        if (board[xMinus, yMinus].setType == Tile.tileType.Grass)
+                        {
+                            board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                            board[x, y].setType = Tile.tileType.ShallowWater;
+                        }
+                        else if (board[xPlus, yMinus].setType == Tile.tileType.Grass) {
+                            board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                            board[x, y].setType = Tile.tileType.ShallowWater;
+                        }
+                    }
+                    else
+                    {
+                        if (board[xPlus, yPlus].setType == Tile.tileType.Grass)
+                        {
+                            board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                            board[x, y].setType = Tile.tileType.ShallowWater;
+                        }
+                        else if (board[xMinus, yPlus].setType == Tile.tileType.Grass) {
+                            board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                            board[x, y].setType = Tile.tileType.ShallowWater;
+                        }
+                    }
+
+                    
+                }
+            }
+        }
 	}
 	
 	// Update is called once per frame
