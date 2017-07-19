@@ -115,16 +115,139 @@ public class BoardManager : MonoBehaviour {
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
                     }
-
                     
                 }
             }
         }
+
+        int riverX = Random.Range(0, boardSize);
+        int riverY = Random.Range(0, boardSize);
+        while (board[riverX, riverY].setType != Tile.tileType.ShallowWater) {
+            riverX = Random.Range(0, boardSize);
+            riverY = Random.Range(0, boardSize);
+        }
+        board[riverX, riverY].hasWater = true;
+        GenerateRiver(riverX, riverY);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	}
+
+    void GenerateRiver(int x, int y, bool start=true){
+        const int maxTries = 12;
+
+        int tries = 0;
+
+        int xPlus = (x + 1 < boardSize) ? (x + 1) : 0;
+        int xMinus = (x - 1 >= 0) ? (x - 1) : (boardSize - 1);
+        int yPlus = (y + 1 < boardSize) ? (y + 1) : 0;
+        int yMinus = (y - 1 >= 0) ? (y - 1) : (boardSize - 1);
+
+        bool generated = false;
+        int startTry = -1;
+
+        int nextTile = Random.Range(0, 6);
+
+        Tile nextRiverTile = board[x,y];
+        int nextX=0, nextY=0;
+        while (!generated)
+        {
+            switch (nextTile)
+            {
+                case 0:
+                    if (x % 2 == 0)
+                    {
+                        nextRiverTile = board[xPlus, y];
+                        nextX = xPlus;
+                        nextY = y;
+                    }
+                    else
+                    {
+                        nextRiverTile = board[xPlus, yMinus];
+                        nextX = xPlus;
+                        nextY = yMinus;
+                        
+                    }
+                    break;
+                case 1:
+                    if (x % 2 == 0) {
+                        nextRiverTile = board[xPlus, yPlus];
+                        nextX = xPlus;
+                        nextY = yPlus;
+                    }
+                    else
+                    {
+                        nextRiverTile = board[xPlus, y];
+                        nextX = xPlus;
+                        nextY = y;
+                    }
+                    break;
+                case 2:
+                    nextRiverTile = board[x,yPlus];
+                    nextX = x;
+                    nextY = yPlus;
+                    break;
+                case 3:
+                    if (x % 2 == 0) {
+                        nextRiverTile = board[xMinus, yPlus];
+                        nextX = xMinus;
+                        nextY = yPlus;
+                    }
+                    else
+                    {
+                        nextRiverTile = board[xMinus, y];
+                        nextX = xMinus;
+                        nextY = y;
+                    }
+                    break;
+                case 4:
+                    if (x % 2 == 0) {
+                        nextRiverTile = board[xMinus, y];
+                        nextX = xMinus;
+                        nextY = y;
+                    }
+                    else
+                    {
+                        nextRiverTile = board[xMinus, yMinus];
+                        nextX = xMinus;
+                        nextY = yMinus;
+                    }
+                    break;
+                case 5:
+                    nextRiverTile = board[x, yMinus];
+                    nextX = x;
+                    nextY = yMinus;
+                    break;
+            }
+            if (nextRiverTile.setType == Tile.tileType.Grass && !nextRiverTile.hasWater) {
+                Debug.Log(nextX+ " " + nextY);
+                nextRiverTile.hasWater = true;
+                nextRiverTile.waterDirections[(nextTile + 3) % 6] = true;
+                board[x, y].waterDirections[nextTile] = true;
+                if (!start)
+                {   
+                    board[x, y].getWaterTexture();
+                }
+                GenerateRiver(nextX, nextY, false);
+                generated = true;
+            } else if(nextRiverTile.setType == Tile.tileType.ShallowWater && !start && !nextRiverTile.hasWater)
+            {
+                board[x, y].waterDirections[nextTile] = true;
+                board[x, y].getWaterTexture();
+                generated = true;
+            }
+            else
+            {
+                nextTile = Random.Range(0, 6);
+                if (tries == maxTries) {
+                    generated = true;
+                }
+                tries++;
+            }
+        }
+        
+    }
 
     void GenerateContinent(int x, int y, float p){
         grassTiles++;
