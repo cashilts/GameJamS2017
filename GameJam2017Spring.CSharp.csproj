@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\BoardManager.cs" />
     <Compile Include="Assets\Resources\Scripts\CameraController.cs" />
+    <Compile Include="Assets\Resources\Scripts\MiniMap.cs" />
     <Compile Include="Assets\Resources\Scripts\Tile.cs" />
     <Compile Include="Assets\Resources\Scripts\TileSelector.cs" />
     <Compile Include="Assets\Resources\Scripts\TileWrapper.cs" />
