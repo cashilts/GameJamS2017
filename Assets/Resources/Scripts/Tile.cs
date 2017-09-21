@@ -10,6 +10,9 @@ public class Tile : MonoBehaviour {
     public bool hasWater = false;
     static readonly string[] directionNames = { "TL", "TR", "R", "BR", "BL", "L" };
 
+    public List<BoardObject> objectsOnTile;
+
+
 	// Use this for initialization
 	void Start () {
 		
@@ -22,8 +25,7 @@ public class Tile : MonoBehaviour {
     public void getWaterTexture() {
         string waterTexturePath = "Models/Textures/newRiver";
         for (int i = 0; i < 6; i++) {
-            if (waterDirections[i])
-            {
+            if (waterDirections[i]) {
                 waterTexturePath += directionNames[i];
             }
         }

@@ -12,20 +12,32 @@ public class BoardManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	}
+
+    public void GenerateIcePoles()
+    {
         float startX = (boardSize / 2) * tileWidth * -1;
         float startY = (boardSize / 2) * tileHeight * -1;
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++){
+        for (int i = 0; i < boardSize; i++)
+        {
+            for (int j = 0; j < boardSize; j++)
+            {
                 GameObject newTile = GameObject.Instantiate(newTile = (GameObject)Resources.Load("Prefabs/DeepWaterTex"));
                 newTile.name = "tile" + j + "," + i;
                 newTile.transform.position = new Vector3(startX + (tileWidth * j), 0, startY + (tileHeight * i));
                 newTile.transform.parent = this.transform;
                 board[i, j] = newTile.GetComponent<Tile>();
             }
-            if (i % 2 == 0){
+            if (i % 2 == 0)
+            {
                 startX -= tileWidth / 2;
             }
-            else {
+            else
+            {
                 startX += tileWidth / 2;
             }
         }
@@ -33,12 +45,15 @@ public class BoardManager : MonoBehaviour {
         GenerateIce(iceX, 0, 100);
         iceX = (int)Random.Range(0.4f * boardSize, 0.6f * boardSize);
         GenerateIce(iceX, boardSize - 1, 100);
+    }
 
+    public void GenerateContinents()
+    {
         int continentP = 100;
         int continentNum = 1;
         int continentMax = 1;
         Debug.Log("StartGen");
-        while (grassTiles <(boardSize * boardSize * 0.35))
+        while (grassTiles < (boardSize * boardSize * 0.35))
         {
             Debug.Log("Not enough Grass");
             while (Random.Range(0, 100) <= continentP)
@@ -46,7 +61,7 @@ public class BoardManager : MonoBehaviour {
                 Debug.Log("Making " + continentNum + " continents");
                 while (continentNum != 0)
                 {
-                    int x = (int)Random.Range(0, boardSize-1);
+                    int x = (int)Random.Range(0, boardSize - 1);
                     int y = (int)Random.Range(0, boardSize - 1);
                     if (board[x, y].setType == Tile.tileType.DeepWater)
                     {
@@ -63,10 +78,16 @@ public class BoardManager : MonoBehaviour {
             }
             continentP += 3;
         }
+    }
 
-        for (int x = 0; x < boardSize; x++) {
-            for (int y = 0; y < boardSize; y++) {
-                if (board[x, y].setType == Tile.tileType.DeepWater) {
+    public void PlaceShallowWater()
+    {
+        for (int x = 0; x < boardSize; x++)
+        {
+            for (int y = 0; y < boardSize; y++)
+            {
+                if (board[x, y].setType == Tile.tileType.DeepWater)
+                {
                     int xPlus = (x + 1 < boardSize) ? (x + 1) : 0;
                     int xMinus = (x - 1 >= 0) ? (x - 1) : (boardSize - 1);
                     int yPlus = (y + 1 < boardSize) ? (y + 1) : 0;
@@ -92,13 +113,15 @@ public class BoardManager : MonoBehaviour {
                         board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
                         board[x, y].setType = Tile.tileType.ShallowWater;
                     }
-                    else if (x % 2 == 1) {
+                    else if (x % 2 == 1)
+                    {
                         if (board[xMinus, yMinus].setType == Tile.tileType.Grass)
                         {
                             board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
-                        else if (board[xPlus, yMinus].setType == Tile.tileType.Grass) {
+                        else if (board[xPlus, yMinus].setType == Tile.tileType.Grass)
+                        {
                             board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
@@ -110,29 +133,33 @@ public class BoardManager : MonoBehaviour {
                             board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
-                        else if (board[xMinus, yPlus].setType == Tile.tileType.Grass) {
+                        else if (board[xMinus, yPlus].setType == Tile.tileType.Grass)
+                        {
                             board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
                     }
-                    
+
                 }
             }
         }
+    }
 
-        int riverX = Random.Range(0, boardSize);
-        int riverY = Random.Range(0, boardSize);
-        while (board[riverX, riverY].setType != Tile.tileType.ShallowWater) {
-            riverX = Random.Range(0, boardSize);
-            riverY = Random.Range(0, boardSize);
+    public void PlaceRivers()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            int riverX = Random.Range(0, boardSize);
+            int riverY = Random.Range(0, boardSize);
+            while (board[riverX, riverY].setType != Tile.tileType.ShallowWater)
+            {
+                riverX = Random.Range(0, boardSize);
+                riverY = Random.Range(0, boardSize);
+            }
+            board[riverX, riverY].hasWater = true;
+            GenerateRiver(riverX, riverY);
         }
-        board[riverX, riverY].hasWater = true;
-        GenerateRiver(riverX, riverY);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	}
+    }
 
     void GenerateRiver(int x, int y, bool start=true){
         const int maxTries = 12;

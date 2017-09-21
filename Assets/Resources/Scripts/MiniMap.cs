@@ -19,7 +19,7 @@ public class MiniMap : MonoBehaviour {
                 for (int j = 0; j < 100; j++) { 
 
                     Color32 setColor = new Color(0,0,0,0);
-                    Tile currTile = boardMan.getTile(i, j);
+                    Tile currTile = boardMan.getTile(j, i);
                     if (currTile.setType == Tile.tileType.DeepWater)
                     {
                         setColor = new Color32(63, 72, 204,255);
