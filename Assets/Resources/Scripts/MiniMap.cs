@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MiniMap : MonoBehaviour {
     bool generated = false;
@@ -22,14 +24,14 @@ public class MiniMap : MonoBehaviour {
                     Tile currTile = boardMan.getTile(j, i);
                     if (currTile.setType == Tile.tileType.DeepWater)
                     {
-                        setColor = new Color32(63, 72, 204,255);
+                        setColor = new Color32(44, 47, 112,255);
                     }
                     else if (currTile.setType == Tile.tileType.Grass)
                     {
-                        setColor = new Color32(34, 177, 76, 255);
+                        setColor = new Color32(29, 95, 37, 255);
                         if (currTile.hasWater)
                         {
-                            Color32 riverColor = new Color32(0, 162, 232, 255);
+                            Color32 riverColor = new Color32(17, 92, 115, 255);
 
                             if (currTile.waterDirections[0]) myNewText.SetPixel(i * 3, j * 3, riverColor);
                             else myNewText.SetPixel(i * 3, j * 3, setColor);
@@ -59,14 +61,13 @@ public class MiniMap : MonoBehaviour {
                     }
                     else if(currTile.setType == Tile.tileType.ShallowWater)
                     {
-                        setColor = new Color32(0, 162, 232,255);
+                        setColor = new Color32(17, 92, 115,255);
                     }
                     else if(currTile.setType == Tile.tileType.Ice)
                     {
-                        setColor = new Color32(191, 241, 255,255);
+                        setColor = new Color32(108, 130, 120,255);
                         
                     }
-                    Debug.Log(setColor);
                     myNewText.SetPixel(i * 3, j * 3, setColor);
                     myNewText.SetPixel(i * 3 + 1, j * 3, setColor);
                     myNewText.SetPixel(i * 3 + 2, j * 3, setColor);
@@ -80,7 +81,8 @@ public class MiniMap : MonoBehaviour {
                 }
             }
             myNewText.Apply();
-            GetComponent<MeshRenderer>().material.SetTexture(Shader.PropertyToID("_MainTex"), myNewText);
+            GetComponent<Image>().material.SetTexture(Shader.PropertyToID("_MainTex"), myNewText);
+            //GetComponent<MeshRenderer>().material.SetTexture(Shader.PropertyToID("_MainTex"), myNewText);
             generated = true;
         }
         		

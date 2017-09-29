@@ -148,7 +148,7 @@ public class BoardManager : MonoBehaviour {
         {
             int riverX = Random.Range(0, boardSize);
             int riverY = Random.Range(0, boardSize);
-            while (board[riverX, riverY].setType != Tile.tileType.ShallowWater)
+            while (board[riverX, riverY].setType != Tile.tileType.Grass)
             {
                 riverX = Random.Range(0, boardSize);
                 riverY = Random.Range(0, boardSize);
