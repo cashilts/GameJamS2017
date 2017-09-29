@@ -52,13 +52,10 @@ public class BoardManager : MonoBehaviour {
         int continentP = 100;
         int continentNum = 1;
         int continentMax = 1;
-        Debug.Log("StartGen");
         while (grassTiles < (boardSize * boardSize * 0.35))
         {
-            Debug.Log("Not enough Grass");
             while (Random.Range(0, 100) <= continentP)
             {
-                Debug.Log("Making " + continentNum + " continents");
                 while (continentNum != 0)
                 {
                     int x = (int)Random.Range(0, boardSize - 1);

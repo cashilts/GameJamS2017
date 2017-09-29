@@ -12,7 +12,7 @@ public class MiniMap : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (!generated) {
-            BoardManager boardMan = GameObject.Find("GameObject").GetComponent<BoardManager>();
+            BoardManager boardMan = GameObject.Find("BoardGenerator").GetComponent<BoardManager>();
             Texture2D myNewText = new Texture2D(100 * 3, 100 * 3);
             for(int i = 0; i<100; i++)
             {
@@ -26,7 +26,36 @@ public class MiniMap : MonoBehaviour {
                     }
                     else if (currTile.setType == Tile.tileType.Grass)
                     {
-                        setColor = new Color32(34, 177, 76,255);
+                        setColor = new Color32(34, 177, 76, 255);
+                        if (currTile.hasWater)
+                        {
+                            Color32 riverColor = new Color32(0, 162, 232, 255);
+
+                            if (currTile.waterDirections[0]) myNewText.SetPixel(i * 3, j * 3, riverColor);
+                            else myNewText.SetPixel(i * 3, j * 3, setColor);
+
+                            myNewText.SetPixel(i * 3 + 1, j * 3, riverColor);
+
+                            if (currTile.waterDirections[1]) myNewText.SetPixel(i * 3 + 2, j * 3, riverColor);
+                            else myNewText.SetPixel(i * 3 + 2, j * 3, setColor);
+
+                            if (currTile.waterDirections[5]) myNewText.SetPixel(i * 3, j * 3 + 1, riverColor);
+                            else myNewText.SetPixel(i * 3, j * 3 + 1, setColor);
+
+                            myNewText.SetPixel(i * 3 + 1, j * 3 + 1, riverColor);
+
+                            if (currTile.waterDirections[2]) myNewText.SetPixel(i * 3 + 2, j * 3 + 1, riverColor);
+                            else myNewText.SetPixel(i * 3 + 2, j * 3 + 1, setColor);
+
+                            if (currTile.waterDirections[4]) myNewText.SetPixel(i * 3, j * 3 + 2, riverColor);
+                            else myNewText.SetPixel(i * 3, j * 3 + 2, setColor);
+
+                            myNewText.SetPixel(i * 3 + 1, j * 3 + 2, setColor);
+
+                            if (currTile.waterDirections[3]) myNewText.SetPixel(i * 3 + 2, j * 3 + 2, riverColor);
+                            else myNewText.SetPixel(i * 3 + 2, j * 3 + 2, setColor);
+                            continue;
+                        }
                     }
                     else if(currTile.setType == Tile.tileType.ShallowWater)
                     {

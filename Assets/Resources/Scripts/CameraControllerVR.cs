@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour {
+public class CameraControllerVR : MonoBehaviour {
     SteamVR_TrackedController leftController;
     float scrollRate = 0.2f;
 	// Use this for initialization

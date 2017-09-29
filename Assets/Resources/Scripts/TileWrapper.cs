@@ -10,10 +10,11 @@ public class TileWrapper : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        GameObject boardSource = GameObject.Find("BoardGenerator");
         for (int i = 0; i < BoardManager.boardSize; i++) {
             List<GameObject> tempList = new List<GameObject>();
             for (int j = 0; j < BoardManager.boardSize; j++) {
-                GameObject tempTile = GameObject.Find("tile" + i +","+j);
+                GameObject tempTile = boardSource.transform.Find("tile" + i +","+j).gameObject;
                 tempList.Add(tempTile);
             }
             boardReferance.Add(tempList);
@@ -22,15 +23,9 @@ public class TileWrapper : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if ((transform.position - gridCenter).x > BoardManager.tileWidth){
-            gridCenter.x += BoardManager.tileWidth;
-            gridOffsetX += 1;
-            ShiftTilesX(1);
-        }
-        else if ((transform.position - gridCenter).x < BoardManager.tileWidth * -1){
-            gridCenter.x -= BoardManager.tileWidth;
-            gridOffsetX -= 1;
-            ShiftTilesX(-1);
+        if(transform.position.x > ((BoardManager.tileHeight * BoardManager.boardSize) / 2))
+        {
+            transform.SetPositionAndRotation(new Vector3((BoardManager.tileHeight * BoardManager.boardSize) / 2, transform.position.y, transform.position.z), transform.rotation);
         }
         if ((transform.position - gridCenter).z > BoardManager.tileHeight)
         {
