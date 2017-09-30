@@ -370,6 +370,15 @@ public class BoardManager : MonoBehaviour {
                 spawnY = Random.Range(0, boardSize);
             }
             GameObject newSettler = Instantiate((GameObject)Resources.Load("Prefabs/Settler"));
+            newSettler.name = "Settler" + i;
+            if(i == 0)
+            {
+                newSettler.transform.Find("Cube").GetComponent<SkinnedMeshRenderer>().materials[0].SetColor("_Color", new Color(255, 0, 0));
+            }
+            else
+            {
+                newSettler.transform.Find("Cube").GetComponent<SkinnedMeshRenderer>().materials[0].SetColor("_Color", new Color(0, 255, 0));
+            }
             DontDestroyOnLoad(newSettler);
             board[spawnX, spawnY].addUnitsToTile(newSettler);
         }

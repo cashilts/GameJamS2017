@@ -5,7 +5,9 @@ using UnityEngine;
 public class RadialButton : MonoBehaviour {
 
     passDelegate functionToCall;
+    passDelegateNoValue functionNoValue;
     int valueToPass;
+    bool valueNeeded;
 	// Use this for initialization
 	void Start () {
 		
@@ -17,15 +19,31 @@ public class RadialButton : MonoBehaviour {
 	}
 
     public delegate void passDelegate(int i);
+    public delegate void passDelegateNoValue();
 
     public void createButton(passDelegate functionOnPress,int passValue)
     {
         functionToCall = functionOnPress;
         valueToPass = passValue;
+        valueNeeded = true;
+    }
+
+    public void createButton(passDelegateNoValue functionOnPress)
+    {
+        functionNoValue = functionOnPress;
+        valueNeeded = false;
     }
 
     public void onClick()
     {
-        functionToCall(valueToPass);
+        if (valueNeeded)
+        {
+            functionToCall(valueToPass);
+        }
+        else
+        {
+            functionNoValue();
+        }
+        
     }
 }

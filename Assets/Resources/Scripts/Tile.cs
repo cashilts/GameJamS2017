@@ -11,6 +11,8 @@ public class Tile : MonoBehaviour {
     static readonly string[] directionNames = { "TL", "TR", "R", "BR", "BL", "L" };
 
     public List<Unit> unitsOnTile = new List<Unit>(5);
+    public Unit selectedUnit;
+    RadialMenu tileMenu;
 
 
 	// Use this for initialization
@@ -36,8 +38,11 @@ public class Tile : MonoBehaviour {
 
     public void addUnitsToTile(GameObject unit)
     {
+        
         unit.transform.SetParent(transform,false);
         unitsOnTile.Add(unit.GetComponent<Settler>());
+        if (unitsOnTile.Count > 1) unit.SetActive(false);
+        else selectedUnit = unit.GetComponent<Settler>();
     }
 
 
@@ -45,18 +50,48 @@ public class Tile : MonoBehaviour {
     public void onMouseButtonDown()
     {
         if (unitsOnTile.Count == 0) return;
+        if(unitsOnTile.Count == 1)
+        {
+            /*System.String name = gameObject.name;
+            int commaBreak = name.IndexOf(',');
+            int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
+            int y = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
+
+            transform.parent.GetComponent<BoardManager>().markTilesInRadius(unitsOnTile[0].baseSpeed, y, x);*/
+
+            unitsOnTile[0].onSelect();
+        }
+        else
+        {
+            GameObject newMenu = (GameObject)Instantiate(Resources.Load("Prefabs/RadialMenu"));
+            newMenu.transform.SetParent(transform,false);
+            for(int i = 0; i<unitsOnTile.Count; i++)
+            {
+                newMenu.GetComponent<RadialMenu>().addOptionToMenu(new RadialButton.passDelegate(SelectUnit), i, Resources.Load<Sprite>("Images/flag"));
+            }
+            tileMenu = newMenu.GetComponent<RadialMenu>();
+        }
+        
+    }
+
+    public void SelectUnit(int unitToSelect)
+    {
+        Destroy(tileMenu.gameObject);
         System.String name = gameObject.name;
         int commaBreak = name.IndexOf(',');
         int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
         int y = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
-
-        transform.parent.GetComponent<BoardManager>().markTilesInRadius(unitsOnTile[0].baseSpeed, y, x);
+        selectedUnit.gameObject.SetActive(false);
+        unitsOnTile[unitToSelect].gameObject.SetActive(true);
+        selectedUnit = unitsOnTile[unitToSelect];
+        selectedUnit.onSelect();
+        
     }
 
     public void onMouseButtonUp(Tile endPoint)
     {
         if (unitsOnTile.Count == 0) return;
-
+        /*
         System.String name = gameObject.name;
         int commaBreak = name.IndexOf(',');
         int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
@@ -89,12 +124,20 @@ public class Tile : MonoBehaviour {
                     unitsOnTile.Remove(unitsOnTile[0]);
                 }
             }
+            //return;
         }
 
         endPoint.addUnitsToTile(unitsOnTile[0].gameObject);
         unitsOnTile.Remove(unitsOnTile[0]);
-
+        */
         
+    }
+
+    public void removeUnit(Unit removedUnit)
+    {
+        unitsOnTile.Remove(removedUnit);
+        selectedUnit = unitsOnTile[0];
+        selectedUnit.gameObject.SetActive(true);
     }
 
 }

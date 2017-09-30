@@ -18,13 +18,41 @@ public class RadialMenu : MonoBehaviour {
 	void Update () {
 	}
 
-    public void addOptionToMenu(RadialButton.passDelegate methodToCall, int valueToGive)
+    public void addOptionToMenu(RadialButton.passDelegate methodToCall, int valueToGive,Sprite imageForButton)
     {
         if (currentObjects != maxObjects)
         {
+            currentObjects++;
             GameObject newButton = (GameObject)Instantiate(Resources.Load("Prefabs/RadialButton"));
             newButton.transform.SetParent(transform, false);
+
+            float xCoord = Mathf.Cos(Mathf.PI * 2 * ((float)currentObjects / (float)maxObjects));
+            float yCoord = Mathf.Sin(Mathf.PI * 2 * ((float)currentObjects / (float)maxObjects));
+
             newButton.GetComponent<RadialButton>().createButton(methodToCall, valueToGive);
+            newButton.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = imageForButton;
+            newButton.transform.localPosition = new Vector3(xCoord, 0, yCoord);
+
+            Camera.main.GetComponent<CameraControllerPC>().menuOpened(this);
+        }
+    }
+
+    public void addOptionToMenu(RadialButton.passDelegateNoValue methodToCall, Sprite imageForButton)
+    {
+        if (currentObjects != maxObjects)
+        {
+            currentObjects++;
+            GameObject newButton = (GameObject)Instantiate(Resources.Load("Prefabs/RadialButton"));
+            newButton.transform.SetParent(transform, false);
+
+            float xCoord = Mathf.Cos(Mathf.PI * 2 * ((float)currentObjects / (float)maxObjects));
+            float yCoord = Mathf.Sin(Mathf.PI * 2 * ((float)currentObjects / (float)maxObjects));
+
+            newButton.GetComponent<RadialButton>().createButton(methodToCall);
+            newButton.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = imageForButton;
+            newButton.transform.localPosition = new Vector3(xCoord, 0, yCoord);
+
+            Camera.main.GetComponent<CameraControllerPC>().menuOpened(this);
         }
     }
 }

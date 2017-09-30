@@ -5,12 +5,20 @@ using UnityEngine;
 public class CameraControllerPC : MonoBehaviour {
 
     Tile selectedTile;
-    LineRenderer trace;
-    MeshRenderer previousMesh;
+    GameObject previouslySelected;
     Tile startTile;
+    RadialMenu openMenu = null;
+    RadialButton selectedButton;
+    public enum inputModes {TILESELECT,ACTIONTARGET};
+    inputModes currentInputMode = inputModes.TILESELECT;
+    targetSelectMethod onActionTarget;
+
+    public delegate void targetSelectMethod(Tile tile);
+
+
     // Use this for initialization
     void Start () {
-        previousMesh = GameObject.Find("tile0,0").GetComponent<MeshRenderer>();
+        previouslySelected = GameObject.Find("tile0,0");
     }
 
     // Update is called once per frame
@@ -43,14 +51,16 @@ public class CameraControllerPC : MonoBehaviour {
         mouseTouchPoint.Normalize();
         RaycastHit hit;
         
-        if (Physics.Raycast(transform.position, mouseTouchPoint*-1, out hit, 30))
+        if (Physics.Raycast(transform.position, mouseTouchPoint*-1, out hit, 50))
         {
-
-            MeshRenderer currentMesh = hit.collider.GetComponent<MeshRenderer>();
-            selectedTile = currentMesh.GetComponent<Tile>();
-
+            GameObject currentlySelected = hit.collider.gameObject;
+            selectedTile = currentlySelected.GetComponent<Tile>();
+            if(selectedTile == null)
+            {
+                selectedButton = currentlySelected.GetComponent<RadialButton>();
+            }
             //If the currently selected mesh is hit again, don't update the texture
-            if (currentMesh != previousMesh)
+            if (currentlySelected != previouslySelected)
             {
 
                 //Add on a highlight to the selected tile to show it got hit
@@ -61,20 +71,55 @@ public class CameraControllerPC : MonoBehaviour {
                 newMaterials = new Material[1];
                 newMaterials[0] = previousMesh.materials[0];
                 previousMesh.materials = newMaterials; */
-                previousMesh = currentMesh;
+                previouslySelected = currentlySelected;
             }
         }
 
         if (Input.GetMouseButtonDown(0))
         {
-            
-            startTile = selectedTile;
-            startTile.onMouseButtonDown();
+            if (currentInputMode == inputModes.TILESELECT)
+            {
+                if (selectedTile != null && openMenu != null)
+                {
+                    Destroy(openMenu.gameObject);
+                    selectedButton = null;
+                }
+                else if (selectedTile == null && selectedButton != null)
+                {
+                    selectedButton.onClick();
+                }
+                else
+                {
+                    startTile = selectedTile;
+                    startTile.onMouseButtonDown();
+                }
+            }
+            else if(currentInputMode == inputModes.ACTIONTARGET)
+            {
+                if(selectedTile != null && onActionTarget != null)
+                {
+                    onActionTarget(selectedTile);
+                }
+            }
         }
         if (Input.GetMouseButtonUp(0))
-        {
-            startTile.onMouseButtonUp(selectedTile);
+        { 
             
         }
+    }
+
+    public void menuOpened(RadialMenu menu)
+    {
+        openMenu = menu;
+    }
+
+    public void changeMode(inputModes newMode)
+    {
+        currentInputMode = newMode;
+    }
+
+    public void setActionTarget(targetSelectMethod onSelectMethod)
+    {
+        onActionTarget = onSelectMethod;   
     }
 }

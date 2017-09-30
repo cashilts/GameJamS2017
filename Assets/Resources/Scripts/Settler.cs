@@ -51,6 +51,12 @@ public class Settler : Unit {
 
     public override void onSelect()
     {
-        Debug.Log("Selected");
+        base.onSelect();
+        unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(settle), Resources.Load<Sprite>("Images/flag"));
+    }
+
+    public void settle()
+    {
+
     }
 }
