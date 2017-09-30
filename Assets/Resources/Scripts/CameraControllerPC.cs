@@ -7,6 +7,7 @@ public class CameraControllerPC : MonoBehaviour {
     Tile selectedTile;
     LineRenderer trace;
     MeshRenderer previousMesh;
+    Tile startTile;
     // Use this for initialization
     void Start () {
         previousMesh = GameObject.Find("tile0,0").GetComponent<MeshRenderer>();
@@ -15,7 +16,7 @@ public class CameraControllerPC : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         Vector3 mousePos = Input.mousePosition;
-        if (mousePos.x > 0 && mousePos.y > 0)
+        if (mousePos.x > 0 && mousePos.y > 0 && mousePos.x < Screen.width && mousePos.y < Screen.height)
         {
             if (mousePos.x < Screen.width * 0.25)
             {
@@ -53,15 +54,27 @@ public class CameraControllerPC : MonoBehaviour {
             {
 
                 //Add on a highlight to the selected tile to show it got hit
-                Material[] newMaterials = new Material[2];
+                /*Material[] newMaterials = new Material[2];
                 newMaterials[0] = currentMesh.material;
                 newMaterials[1] = (Material)Resources.Load("Models/Materials/Highlight");
                 currentMesh.materials = newMaterials;
                 newMaterials = new Material[1];
                 newMaterials[0] = previousMesh.materials[0];
-                previousMesh.materials = newMaterials;
+                previousMesh.materials = newMaterials; */
                 previousMesh = currentMesh;
             }
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            
+            startTile = selectedTile;
+            startTile.onMouseButtonDown();
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            startTile.onMouseButtonUp(selectedTile);
+            
         }
     }
 }

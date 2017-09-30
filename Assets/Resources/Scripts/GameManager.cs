@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
     List<Player> players;
-    const int numPlayers = 2;
+    public const int numPlayers = 2;
     int activePlayer = -1;
     public int turnCount = 0;
 

@@ -30,6 +30,8 @@ public class GameLoader : MonoBehaviour {
         stateText.text = "Placing Rivers";
         genScript.PlaceRivers();
 
+        
+
         DontDestroyOnLoad(boardGen.transform.gameObject);
         slider.value = 1;
         stateText.text = "Complete";
@@ -37,9 +39,10 @@ public class GameLoader : MonoBehaviour {
         GameObject gameMan = GameObject.Instantiate((GameObject)Resources.Load("Prefabs/GameManager"));
         gameMan.name = "GameManager";
         DontDestroyOnLoad(gameMan);
-
+        
         StateManager stateMan = GameObject.Find("SceneManager").GetComponent<StateManager>();
         stateMan.LoadScene();
+        genScript.spawnStartUnits();
     }
 	
 	// Update is called once per frame

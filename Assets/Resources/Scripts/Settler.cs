@@ -21,6 +21,14 @@ public class Settler : Unit {
         }
     }
 
+    public override int baseSpeed
+    {
+        get
+        {
+            return 2;
+        }
+    }
+
     protected override int maintenanceCost
     {
         get
@@ -43,5 +51,6 @@ public class Settler : Unit {
 
     public override void onSelect()
     {
+        Debug.Log("Selected");
     }
 }
