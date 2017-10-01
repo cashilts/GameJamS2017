@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour {
         while (true)
         {
             activePlayer++;
-            if (activePlayer < numPlayers-1)
+            if (activePlayer < numPlayers)
             {
                 if (players[activePlayer].aiPlayer)
                 {

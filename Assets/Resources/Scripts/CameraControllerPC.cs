@@ -10,7 +10,7 @@ public class CameraControllerPC : MonoBehaviour {
     Tile startTile;
     RadialMenu openMenu = null;
     RadialButton selectedButton;
-    public enum inputModes {TILESELECT,ACTIONTARGET};
+    public enum inputModes {TILESELECT,ACTIONTARGET,INMENU};
     inputModes currentInputMode = inputModes.TILESELECT;
     targetSelectMethod onActionTarget;
     Canvas tileInfoTab;
@@ -30,23 +30,27 @@ public class CameraControllerPC : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         Vector3 mousePos = Input.mousePosition;
-        if (mousePos.x > 0 && mousePos.y > 0 && mousePos.x < Screen.width && mousePos.y < Screen.height)
+        if (currentInputMode == inputModes.TILESELECT || currentInputMode == inputModes.ACTIONTARGET)
         {
-            if (mousePos.x < Screen.width * 0.25)
+            
+            if (mousePos.x > 0 && mousePos.y > 0 && mousePos.x < Screen.width && mousePos.y < Screen.height)
             {
-                transform.Translate(-0.1f, 0, 0);
-            }
-            else if (mousePos.x > Screen.width * 0.75)
-            {
-                transform.Translate(0.1f, 0, 0);
-            }
-            if (mousePos.y < Screen.height * 0.25)
-            {
-                transform.Translate(0, -0.1f, 0);
-            }
-            else if (mousePos.y > Screen.height * 0.75)
-            {
-                transform.Translate(0, 0.1f, 0);
+                if (mousePos.x < Screen.width * 0.25)
+                {
+                    transform.Translate(-0.1f, 0, 0);
+                }
+                else if (mousePos.x > Screen.width * 0.75)
+                {
+                    transform.Translate(0.1f, 0, 0);
+                }
+                if (mousePos.y < Screen.height * 0.25)
+                {
+                    transform.Translate(0, -0.1f, 0);
+                }
+                else if (mousePos.y > Screen.height * 0.75)
+                {
+                    transform.Translate(0, 0.1f, 0);
+                }
             }
         }
         Vector2 mouseScroll = Input.mouseScrollDelta;
@@ -129,6 +133,14 @@ public class CameraControllerPC : MonoBehaviour {
                 if(selectedTile != null && onActionTarget != null)
                 {
                     onActionTarget(selectedTile);
+                }
+            }
+            else if (currentInputMode == inputModes.INMENU)
+            {
+                if (Input.mousePosition.x < Screen.width / 2)
+                {
+                    Destroy(GameObject.Find("CityMenu"));
+                    changeMode(inputModes.TILESELECT);
                 }
             }
         }

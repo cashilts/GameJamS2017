@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class Unit : BoardObject {
 
@@ -8,11 +9,13 @@ public abstract class Unit : BoardObject {
     //All units must set constant values for their base attack and defence
     public abstract int baseAttack { get; }
     public abstract int baseDefense { get; }
+    public abstract int buildCost { get; }
     protected abstract int baseSpeed { get; }
     public int speed;
     public int ownerIndex = 0;
     protected Player owner;
     protected abstract int maintenanceCost { get; }
+    public abstract string iconImage { get; }
 
     protected RadialMenu unitMenu;
 	// Use this for initialization
@@ -30,6 +33,7 @@ public abstract class Unit : BoardObject {
     public override void onSelect()
     {
         base.onSelect();
+        GameObject.Find("InfoPanel").GetComponent<InfoPanel>().setObject(this);
         GameObject radialMenuObj = (GameObject)Instantiate(Resources.Load("Prefabs/RadialMenu"));
         radialMenuObj.transform.SetParent(transform.parent, false);
         unitMenu = radialMenuObj.GetComponent<RadialMenu>();
@@ -72,7 +76,7 @@ public abstract class Unit : BoardObject {
                int newDistance = transform.parent.parent.GetComponent<BoardManager>().distanceBetweenTiles(testX, y, x2, y2);
                if(newDistance <= baseSpeed)
                {
-                   endLocation.addUnitsToTile(gameObject);
+                   endLocation.addUnitsToTile(gameObject.GetComponent<Unit>());
                    transform.parent.GetComponent<Tile>().removeUnit(this);
                    speed -= newDistance; 
                }
@@ -83,7 +87,7 @@ public abstract class Unit : BoardObject {
                int newDistance = transform.parent.parent.GetComponent<BoardManager>().distanceBetweenTiles(x, y, testX, y2);
                if (newDistance <= baseSpeed)
                {
-                   endLocation.addUnitsToTile(gameObject);
+                   endLocation.addUnitsToTile(gameObject.GetComponent<Unit>());
                     transform.parent.GetComponent<Tile>().removeUnit(this);
                     speed -= newDistance;
                }
@@ -91,7 +95,7 @@ public abstract class Unit : BoardObject {
            return;
        }
         transform.parent.GetComponent<Tile>().removeUnit(this);
-        endLocation.addUnitsToTile(gameObject);
+        endLocation.addUnitsToTile(gameObject.GetComponent<Unit>());
         speed -= distanceMoved;
         
         
@@ -107,5 +111,9 @@ public abstract class Unit : BoardObject {
     public virtual void newTurn()
     {
         speed = baseSpeed;
+    }
+    public override void getInfo()
+    {
+        GameObject.Find("InfoText").GetComponent<Text>().text = this.GetType().ToString() + ":\nMovement: " + speed + "\n";
     }
 }

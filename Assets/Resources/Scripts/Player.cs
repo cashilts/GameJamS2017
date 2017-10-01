@@ -10,7 +10,8 @@ public class Player : MonoBehaviour {
     public Color playerColor;
     public Material playerOccupiedTile;
 
-    List<Unit> ownedUnits = new List<Unit>();
+    protected List<Unit> ownedUnits = new List<Unit>();
+    protected List<City> ownedCities = new List<City>();
 
 	// Use this for initialization
 	void Start () {
@@ -31,6 +32,10 @@ public class Player : MonoBehaviour {
         {
             unit.newTurn();
         }
+        foreach(City city in ownedCities)
+        {
+            city.newTurn();
+        }
     }
 
     public virtual void doTurn(){
@@ -40,5 +45,10 @@ public class Player : MonoBehaviour {
     public void giveUnit(Unit unit)
     {
         ownedUnits.Add(unit);
+    }
+
+    public void giveCity(City city)
+    {
+        ownedCities.Add(city);
     }
 }

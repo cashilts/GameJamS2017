@@ -17,6 +17,20 @@ public class AIPlayer : Player {
 
     public override void doTurn()
     {
-        return;
+        foreach(Unit unit in ownedUnits)
+        {
+            if(unit.GetType() == typeof(Settler))
+            {
+                Settler currentSettler = (Settler)unit;
+                currentSettler.settle();
+            }
+        }
+        foreach(City city in ownedCities)
+        {
+            if(city.unitInProduction == null)
+            {
+                city.startProductionOnUnit("Warrior");
+            }
+        }
     }
 }

@@ -18,4 +18,5 @@ public class BoardObject : MonoBehaviour {
 	}
 
     public virtual void onSelect() { }
+    public virtual void getInfo() { }
 }

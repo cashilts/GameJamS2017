@@ -10,7 +10,7 @@ public class BoardManager : MonoBehaviour {
     public const int boardSize = 100;
     int grassTiles = 0;
     Tile[,] board = new Tile[boardSize,boardSize];  
-
+    public enum tileDirections { TL,TR,R,BR,BL,L};
 	// Use this for initialization
 	void Start () {
 	}
@@ -18,6 +18,18 @@ public class BoardManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	}
+
+    public Tile getNeighborByDirection(tileDirections direction, int x, int y)
+    {
+        if (x % 2 == 0)
+        {
+            if(direction == tileDirections.TL)
+            {
+                return board[x - 1, y];
+            }
+        }
+        return board[x, y];
+    }
 
     public void GenerateIcePoles()
     {
@@ -381,7 +393,7 @@ public class BoardManager : MonoBehaviour {
                 newSettler.transform.Find("Cube").GetComponent<SkinnedMeshRenderer>().materials[0].SetColor("_Color", new Color(0, 255, 0));
             }
             DontDestroyOnLoad(newSettler);
-            board[spawnX, spawnY].addUnitsToTile(newSettler);
+            board[spawnX, spawnY].addUnitsToTile(newSettler.GetComponent<Settler>());
         }
     }
 
@@ -478,11 +490,14 @@ public class BoardManager : MonoBehaviour {
     {
         MeshRenderer currentMesh = board[centerX, centerY].GetComponent<MeshRenderer>();
         if (radius < 0 || board[centerX,centerY].setType != Tile.tileType.Grass) return;
-        Material[] newMaterials = new Material[2];
-        newMaterials[0] = currentMesh.material;
-        newMaterials[1] = (Material)Resources.Load("Models/Materials/Highlight");
-        currentMesh.materials = newMaterials;
-
+        int materialCount = currentMesh.materials.Length;
+        List<Material> materialList = new List<Material>();
+        for (int i = 0; i < materialCount; i++)
+        {
+            materialList.Add(currentMesh.materials[i]);
+        }
+        materialList.Add((Material)Resources.Load("Models/Materials/Highlight"));
+        currentMesh.materials = materialList.ToArray();
 
         int xPlus = (centerX + 1 < boardSize) ? (centerX + 1) : 0;
         int xMinus = (centerX - 1 >= 0) ? (centerX - 1) : (boardSize - 1);
@@ -514,10 +529,16 @@ public class BoardManager : MonoBehaviour {
     {
         MeshRenderer currentMesh = board[centerX, centerY].GetComponent<MeshRenderer>();
         if (radius < 0) return;
-        Material[] newMaterials = new Material[1];
-        newMaterials[0] = currentMesh.material;
-        currentMesh.materials = newMaterials;
-
+        int materialCount = currentMesh.materials.Length;
+        List<Material> materialList = new List<Material>();
+        for (int i = 0; i < materialCount; i++)
+        {
+            if(currentMesh.materials[i].name != "Highlight (Instance)")
+            {
+                materialList.Add(currentMesh.materials[i]);
+            }
+        }
+        currentMesh.materials = materialList.ToArray();
         int xPlus = (centerX + 1 < boardSize) ? (centerX + 1) : 0;
         int xMinus = (centerX - 1 >= 0) ? (centerX - 1) : (boardSize - 1);
         int yPlus = (centerY + 1 < boardSize) ? (centerY + 1) : 0;
@@ -541,5 +562,58 @@ public class BoardManager : MonoBehaviour {
             unmarkTilesInRadius(radius - 1, xMinus, yMinus);
             unmarkTilesInRadius(radius - 1, centerX, yMinus);
         }
+    }
+
+    public void claimTile(Tile toClaim,Player owner, int radius)
+    {
+
+        System.String name = toClaim.gameObject.name;
+        int commaBreak = name.IndexOf(',');
+        int x1 = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
+        int y1 = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
+        claimTile(y1, x1, owner, radius);
+        
+    }
+
+    public void claimTile(int x, int y, Player owner, int radius)
+    {
+        if (board[x, y].owner == null && radius > 0)
+        {
+            board[x, y].owner = owner;
+            owner.GPT += board[x, y].wealth;
+            int materialCount = board[x,y].GetComponent<MeshRenderer>().materials.Length;
+            List<Material> materialList = new List<Material>();
+            for (int i = 0; i < materialCount; i++)
+            {
+                materialList.Add(board[x,y].GetComponent<MeshRenderer>().materials[i]);
+            }
+            materialList.Add(owner.playerOccupiedTile);
+            board[x,y].GetComponent<MeshRenderer>().materials = materialList.ToArray();
+
+            int xPlus = (x + 1 < boardSize) ? (x + 1) : 0;
+            int xMinus = (x - 1 >= 0) ? (x - 1) : (boardSize - 1);
+            int yPlus = (y + 1 < boardSize) ? (y + 1) : 0;
+            int yMinus = (y - 1 >= 0) ? (y - 1) : (boardSize - 1);
+
+            if (x % 2 == 0)
+            {
+                claimTile(xPlus, y,owner, radius - 1);
+                claimTile(xPlus, yPlus,owner,radius - 1);
+                claimTile(x, yPlus,owner, radius - 1);
+                claimTile(xMinus, yPlus,owner, radius - 1);
+                claimTile(xMinus, y,owner, radius - 1);
+                claimTile(x, yMinus,owner, radius - 1);
+            }
+            else
+            {
+                claimTile(xPlus, yMinus,owner, radius - 1);
+                claimTile(xPlus, y,owner, radius - 1);
+                claimTile(x, yPlus,owner, radius - 1);
+                claimTile(xMinus, y,owner, radius - 1);
+                claimTile(xMinus, yMinus,owner, radius - 1);
+                claimTile(x, yMinus,owner, radius - 1);
+            }
+        }
+
     }
 }

@@ -36,6 +36,22 @@ public class Settler : Unit {
             return 1;
         }
     }
+
+    public override int buildCost
+    {
+        get
+        {
+            return 3;
+        }
+    }
+
+    public override string iconImage
+    {
+        get
+        {
+            return "flag";
+        }
+    }
     #endregion
 
 
@@ -63,9 +79,16 @@ public class Settler : Unit {
         {
             GameObject newCity = (GameObject)Instantiate(Resources.Load("Prefabs/City"));
             newCity.transform.SetParent(transform.parent,false);
-            transform.parent.GetComponent<Tile>().claimTile(owner);
+            transform.parent.GetComponent<Tile>().cityOnTile = newCity.GetComponent<City>();
+            transform.parent.parent.GetComponent<BoardManager>().claimTile(transform.parent.GetComponent<Tile>(), owner, 2);
             transform.parent.GetComponent<Tile>().removeUnit(this);
-            Destroy(unitMenu.gameObject);
+            owner.giveCity(newCity.GetComponent<City>());
+            newCity.GetComponent<City>().owner = owner;
+            newCity.GetComponent<City>().ownerIndex = ownerIndex;
+            if (unitMenu != null)
+            {
+                Destroy(unitMenu.gameObject);
+            }
             Destroy(gameObject);
         }
     }

@@ -41,47 +41,72 @@ public class Tile : MonoBehaviour {
     }
 
 
-    public void addUnitsToTile(GameObject unit)
+    public void addUnitsToTile(Unit unit)
     {
         
         unit.transform.SetParent(transform,false);
-        unitsOnTile.Add(unit.GetComponent<Settler>());
-        if (unitsOnTile.Count > 1) unit.SetActive(false);
-        else selectedUnit = unit.GetComponent<Settler>();
+        unitsOnTile.Add(unit);
+        if (unitsOnTile.Count > 1) unit.gameObject.SetActive(false);
+        else selectedUnit = unit;
     }
 
 
 
     public void onMouseButtonDown()
     {
-        if (unitsOnTile.Count == 0) return;
-        if(unitsOnTile.Count == 1)
+        if (cityOnTile != null)
         {
-            /*System.String name = gameObject.name;
-            int commaBreak = name.IndexOf(',');
-            int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
-            int y = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
-
-            transform.parent.GetComponent<BoardManager>().markTilesInRadius(unitsOnTile[0].baseSpeed, y, x);*/
-
-            unitsOnTile[0].onSelect();
+            if (unitsOnTile.Count == 0 && cityOnTile.ownerIndex == 0) cityOnTile.onSelect();
+            else if(cityOnTile.ownerIndex == 0)
+            {
+                GameObject newMenu = (GameObject)Instantiate(Resources.Load("Prefabs/RadialMenu"));
+                newMenu.transform.SetParent(transform, false);
+                newMenu.GetComponent<RadialMenu>().addOptionToMenu(new RadialButton.passDelegate(SelectUnit), -1, Resources.Load<Sprite>("Images/town"));
+                for(int i = 0; i< unitsOnTile.Count; i++)
+                {
+                    newMenu.GetComponent<RadialMenu>().addOptionToMenu(new RadialButton.passDelegate(SelectUnit), i, Resources.Load<Sprite>("Images/" + unitsOnTile[i].iconImage));
+                }
+                tileMenu = newMenu.GetComponent<RadialMenu>();
+            }
         }
         else
         {
-            GameObject newMenu = (GameObject)Instantiate(Resources.Load("Prefabs/RadialMenu"));
-            newMenu.transform.SetParent(transform,false);
-            for(int i = 0; i<unitsOnTile.Count; i++)
+
+            if (unitsOnTile.Count == 0) return;
+            if (unitsOnTile.Count == 1 && unitsOnTile[0].ownerIndex == 0)
             {
-                newMenu.GetComponent<RadialMenu>().addOptionToMenu(new RadialButton.passDelegate(SelectUnit), i, Resources.Load<Sprite>("Images/flag"));
+                /*System.String name = gameObject.name;
+                int commaBreak = name.IndexOf(',');
+                int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
+                int y = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
+
+                transform.parent.GetComponent<BoardManager>().markTilesInRadius(unitsOnTile[0].baseSpeed, y, x);*/
+
+                unitsOnTile[0].onSelect();
             }
-            tileMenu = newMenu.GetComponent<RadialMenu>();
+            else if(unitsOnTile[0].ownerIndex == 0)
+            {
+                GameObject newMenu = (GameObject)Instantiate(Resources.Load("Prefabs/RadialMenu"));
+                newMenu.transform.SetParent(transform, false);
+                for (int i = 0; i < unitsOnTile.Count; i++)
+                {
+                    newMenu.GetComponent<RadialMenu>().addOptionToMenu(new RadialButton.passDelegate(SelectUnit), i, Resources.Load<Sprite>("Images/" + unitsOnTile[i].iconImage));
+                }
+                tileMenu = newMenu.GetComponent<RadialMenu>();
+            }
         }
         
     }
 
     public void SelectUnit(int unitToSelect)
     {
+        
         Destroy(tileMenu.gameObject);
+        if (unitToSelect == -1)
+        {
+            cityOnTile.onSelect();
+            return;
+        }
         System.String name = gameObject.name;
         int commaBreak = name.IndexOf(',');
         int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
