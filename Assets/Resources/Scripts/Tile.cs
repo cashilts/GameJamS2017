@@ -12,6 +12,11 @@ public class Tile : MonoBehaviour {
 
     public List<Unit> unitsOnTile = new List<Unit>(5);
     public Unit selectedUnit;
+    public City cityOnTile;
+    public Player owner;
+    public int wealth;
+    public int food;
+
     RadialMenu tileMenu;
 
 
@@ -136,8 +141,25 @@ public class Tile : MonoBehaviour {
     public void removeUnit(Unit removedUnit)
     {
         unitsOnTile.Remove(removedUnit);
-        selectedUnit = unitsOnTile[0];
-        selectedUnit.gameObject.SetActive(true);
+        if (unitsOnTile.Count != 0)
+        {
+            selectedUnit = unitsOnTile[0];
+            selectedUnit.gameObject.SetActive(true);
+        }
+    }
+
+    public void claimTile(Player tileOwner)
+    {
+        owner = tileOwner;
+        tileOwner.GPT += wealth;
+        int materialCount = GetComponent<MeshRenderer>().materials.Length;
+        List<Material> materialList = new List<Material>();
+        for (int i = 0; i < materialCount; i++)
+        {
+            materialList.Add(GetComponent<MeshRenderer>().materials[i]);
+        }
+        materialList.Add(owner.playerOccupiedTile);
+       GetComponent<MeshRenderer>().materials = materialList.ToArray();
     }
 
 }

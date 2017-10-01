@@ -43,6 +43,7 @@ public class GameLoader : MonoBehaviour {
         StateManager stateMan = GameObject.Find("SceneManager").GetComponent<StateManager>();
         stateMan.LoadScene();
         genScript.spawnStartUnits();
+        genScript.initializeResources();
     }
 	
 	// Update is called once per frame

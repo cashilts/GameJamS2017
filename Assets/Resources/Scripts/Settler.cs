@@ -21,7 +21,7 @@ public class Settler : Unit {
         }
     }
 
-    public override int baseSpeed
+    protected override int baseSpeed
     {
         get
         {
@@ -41,8 +41,10 @@ public class Settler : Unit {
 
     // Use this for initialization
     void Start () {
-		
-	}
+        Player myOwner = GameObject.Find("Player" + ownerIndex).GetComponent<Player>();
+        myOwner.giveUnit(this);
+        owner = myOwner;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -57,6 +59,18 @@ public class Settler : Unit {
 
     public void settle()
     {
+        if(transform.parent.GetComponent<Tile>().cityOnTile == null)
+        {
+            GameObject newCity = (GameObject)Instantiate(Resources.Load("Prefabs/City"));
+            newCity.transform.SetParent(transform.parent,false);
+            transform.parent.GetComponent<Tile>().claimTile(owner);
+            Destroy(unitMenu.gameObject);
+            Destroy(gameObject);
+        }
+    }
 
+    public override void newTurn()
+    {
+        speed = baseSpeed;
     }
 }

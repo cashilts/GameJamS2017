@@ -2,21 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIPlayer : Player {
-
+public class City : BoardObject {
 
 	// Use this for initialization
 	void Start () {
-        aiPlayer = true;
+		
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
-
-    public override void doTurn()
-    {
-        return;
-    }
 }

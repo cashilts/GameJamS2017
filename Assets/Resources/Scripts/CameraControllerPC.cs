@@ -19,6 +19,8 @@ public class CameraControllerPC : MonoBehaviour {
     // Use this for initialization
     void Start () {
         previouslySelected = GameObject.Find("tile0,0");
+        Camera.main.transform.position = GameObject.Find("Settler0").transform.position;
+        Camera.main.transform.Translate(0, 0, -5);
     }
 
     // Update is called once per frame
@@ -121,5 +123,10 @@ public class CameraControllerPC : MonoBehaviour {
     public void setActionTarget(targetSelectMethod onSelectMethod)
     {
         onActionTarget = onSelectMethod;   
+    }
+
+    public void inputNextTurn()
+    {
+        GameObject.Find("GameManager").GetComponent<GameManager>().endCurrentTurn();
     }
 }

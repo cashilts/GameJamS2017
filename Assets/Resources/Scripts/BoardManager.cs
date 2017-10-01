@@ -371,6 +371,7 @@ public class BoardManager : MonoBehaviour {
             }
             GameObject newSettler = Instantiate((GameObject)Resources.Load("Prefabs/Settler"));
             newSettler.name = "Settler" + i;
+            newSettler.GetComponent<Settler>().ownerIndex = i;
             if(i == 0)
             {
                 newSettler.transform.Find("Cube").GetComponent<SkinnedMeshRenderer>().materials[0].SetColor("_Color", new Color(255, 0, 0));
@@ -381,6 +382,60 @@ public class BoardManager : MonoBehaviour {
             }
             DontDestroyOnLoad(newSettler);
             board[spawnX, spawnY].addUnitsToTile(newSettler);
+        }
+    }
+
+    public void initializeResources()
+    {
+        for(int i =0; i<boardSize; i++)
+        {
+            for(int j = 0; j<boardSize; j++)
+            {
+                if(board[i,j].setType == Tile.tileType.Ice)
+                {
+                    board[i, j].wealth = 0;
+                    board[i, j].food = 0;
+                }
+                else if(board[i,j].setType == Tile.tileType.Grass)
+                {
+                    int wealthChance = Random.Range(0, 100);
+                    if(wealthChance < 25)
+                    {
+                        board[i, j].wealth = 1;
+                    }
+                    else if(wealthChance < 75)
+                    {
+                        board[i, j].wealth = 2;
+                    }
+                    else
+                    {
+                        board[i, j].wealth = 3;
+                    }
+                    int foodChance = Random.Range(0, 100);
+                    if (foodChance < 25)
+                    {
+                        board[i, j].food = 0;
+                    }
+                    else if(foodChance < 75)
+                    {
+                        board[i, j].food = 1;
+                    }
+                    else
+                    {
+                        board[i, j].food = 2;
+                    }
+                }
+                else if(board[i,j].setType == Tile.tileType.ShallowWater)
+                {
+                    board[i, j].wealth = 0;
+                    board[i, j].food = 0;
+                }
+                else
+                {
+                    board[i, j].wealth = 0;
+                    board[i, j].food = 0;
+                }
+            }
         }
     }
 
@@ -422,7 +477,7 @@ public class BoardManager : MonoBehaviour {
     public void markTilesInRadius(int radius, int centerX, int centerY)
     {
         MeshRenderer currentMesh = board[centerX, centerY].GetComponent<MeshRenderer>();
-        if (radius < 0) return;
+        if (radius < 0 || board[centerX,centerY].setType != Tile.tileType.Grass) return;
         Material[] newMaterials = new Material[2];
         newMaterials[0] = currentMesh.material;
         newMaterials[1] = (Material)Resources.Load("Models/Materials/Highlight");
