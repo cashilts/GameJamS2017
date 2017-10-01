@@ -99,6 +99,7 @@ public abstract class Unit : BoardObject {
 
     public void deleteUnit()
     {
+        transform.parent.GetComponent<Tile>().removeUnit(this);
         Destroy(unitMenu.gameObject);
         Destroy(gameObject);
     }

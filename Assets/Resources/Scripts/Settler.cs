@@ -64,6 +64,7 @@ public class Settler : Unit {
             GameObject newCity = (GameObject)Instantiate(Resources.Load("Prefabs/City"));
             newCity.transform.SetParent(transform.parent,false);
             transform.parent.GetComponent<Tile>().claimTile(owner);
+            transform.parent.GetComponent<Tile>().removeUnit(this);
             Destroy(unitMenu.gameObject);
             Destroy(gameObject);
         }

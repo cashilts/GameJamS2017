@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraControllerPC : MonoBehaviour {
 
@@ -12,7 +13,8 @@ public class CameraControllerPC : MonoBehaviour {
     public enum inputModes {TILESELECT,ACTIONTARGET};
     inputModes currentInputMode = inputModes.TILESELECT;
     targetSelectMethod onActionTarget;
-
+    Canvas tileInfoTab;
+    int hoverCount = 0;
     public delegate void targetSelectMethod(Tile tile);
 
 
@@ -21,6 +23,8 @@ public class CameraControllerPC : MonoBehaviour {
         previouslySelected = GameObject.Find("tile0,0");
         Camera.main.transform.position = GameObject.Find("Settler0").transform.position;
         Camera.main.transform.Translate(0, 0, -5);
+        tileInfoTab = ((GameObject)Instantiate(Resources.Load("Prefabs/TileInfo"))).GetComponent<Canvas>();
+        tileInfoTab.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -48,7 +52,8 @@ public class CameraControllerPC : MonoBehaviour {
         Vector2 mouseScroll = Input.mouseScrollDelta;
         transform.Translate(0, 0, mouseScroll.y);
         mousePos.Set(mousePos.x, mousePos.y, 1);
-        Vector3 mouseTouchPoint = GetComponent<Camera>().ScreenToWorldPoint(mousePos);
+        mousePos = GetComponent<Camera>().ScreenToWorldPoint(mousePos);
+        Vector3 mouseTouchPoint = mousePos;
         mouseTouchPoint = transform.position - mouseTouchPoint;
         mouseTouchPoint.Normalize();
         RaycastHit hit;
@@ -56,10 +61,33 @@ public class CameraControllerPC : MonoBehaviour {
         if (Physics.Raycast(transform.position, mouseTouchPoint*-1, out hit, 50))
         {
             GameObject currentlySelected = hit.collider.gameObject;
-            selectedTile = currentlySelected.GetComponent<Tile>();
-            if(selectedTile == null)
+            Tile newSelectedTile = currentlySelected.GetComponent<Tile>();
+            if(newSelectedTile == null)
             {
+                selectedTile = null;
+                tileInfoTab.gameObject.SetActive(false);
                 selectedButton = currentlySelected.GetComponent<RadialButton>();
+            }
+            else
+            {
+                if(newSelectedTile == selectedTile)
+                {
+                    hoverCount++;
+                    if(hoverCount > 45)
+                    {
+                        tileInfoTab.transform.position = mousePos;
+                        tileInfoTab.transform.Find("TileStats").GetComponent<Text>().text = "Wealth: " + selectedTile.wealth + "\n" + "Food: " + selectedTile.food; ;
+                        tileInfoTab.gameObject.SetActive(true);
+                    }
+                }
+                else
+                {
+                    selectedTile = newSelectedTile;
+                    tileInfoTab.gameObject.SetActive(false);
+                    hoverCount = 0;
+                }
+                
+                
             }
             //If the currently selected mesh is hit again, don't update the texture
             if (currentlySelected != previouslySelected)
