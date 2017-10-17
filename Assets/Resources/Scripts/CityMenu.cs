@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class CityMenu : MonoBehaviour {
+    //Keep track of item count in menu, to be used later to make large menus scroll
     int amountOfOptions = 0;
 
 	// Use this for initialization
@@ -21,9 +22,8 @@ public class CityMenu : MonoBehaviour {
         GameObject newCityOption = (GameObject)Instantiate(Resources.Load("Prefabs/CityOption"));
         newCityOption.transform.GetChild(0).GetComponent<Text>().text = optionText;
         newCityOption.GetComponent<CityOption>().setClickMethod(methodToAdd,arg);
-        newCityOption.transform.SetParent(transform.GetChild(1), false);
-        newCityOption.transform.localPosition = new Vector3(90, 235.8f + (-30 * amountOfOptions));
-        Debug.Log(newCityOption.transform.localPosition);
+        newCityOption.transform.SetParent(transform.GetChild(1), true);
+        newCityOption.GetComponent<RectTransform>().anchoredPosition = new Vector3(90, -15f + (-30 * amountOfOptions));
         amountOfOptions++;
     }
 

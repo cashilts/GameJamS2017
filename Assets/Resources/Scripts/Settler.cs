@@ -52,6 +52,19 @@ public class Settler : Unit {
             return "flag";
         }
     }
+    int _health = 5;
+    public override int health
+    {
+        get
+        {
+            return _health;
+        }
+
+        set
+        {
+            _health = value;
+        }
+    }
     #endregion
 
 
@@ -60,6 +73,7 @@ public class Settler : Unit {
         Player myOwner = GameObject.Find("Player" + ownerIndex).GetComponent<Player>();
         myOwner.giveUnit(this);
         owner = myOwner;
+        allowedTiles.Add(Tile.tileType.Grass);
     }
 	
 	// Update is called once per frame
@@ -83,6 +97,7 @@ public class Settler : Unit {
             transform.parent.parent.GetComponent<BoardManager>().claimTile(transform.parent.GetComponent<Tile>(), owner, 2);
             transform.parent.GetComponent<Tile>().removeUnit(this);
             owner.giveCity(newCity.GetComponent<City>());
+            owner.removeUnit(this);
             newCity.GetComponent<City>().owner = owner;
             newCity.GetComponent<City>().ownerIndex = ownerIndex;
             if (unitMenu != null)

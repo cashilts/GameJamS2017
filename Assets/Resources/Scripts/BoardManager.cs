@@ -2,15 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Xml;
+using Priority_Queue;
 
 public class BoardManager : MonoBehaviour {
-
+   
     public const float tileWidth = 1.7f;
     public const float tileHeight = 1.5f;
     public const int boardSize = 100;
     int grassTiles = 0;
     Tile[,] board = new Tile[boardSize,boardSize];  
     public enum tileDirections { TL,TR,R,BR,BL,L};
+
 	// Use this for initialization
 	void Start () {
 	}
@@ -19,18 +22,173 @@ public class BoardManager : MonoBehaviour {
 	void Update () {
 	}
 
+    /// <summary>
+    /// Returns neighboring tile to the tile at (x,y) based on the direction
+    /// </summary>
+    /// <param name="direction">Direction of neighbor to return</param>
+    /// <param name="x">X coord of current tile</param>
+    /// <param name="y">Y coord of current tile</param>
+    /// <returns></returns>
     public Tile getNeighborByDirection(tileDirections direction, int x, int y)
     {
+        int xPlus = (x + 1 < boardSize) ? (x + 1) : 0;
+        int xMinus = (x - 1 >= 0) ? (x - 1) : (boardSize - 1);
+        int yPlus = (y + 1 < boardSize) ? (y + 1) : 0;
+        int yMinus = (y - 1 >= 0) ? (y - 1) : (boardSize - 1);
+
         if (x % 2 == 0)
         {
             if(direction == tileDirections.TL)
             {
-                return board[x - 1, y];
+                return board[xMinus, y];
+            }
+            else if(direction == tileDirections.TR)
+            {
+                return board[xMinus, yPlus];
+            }
+            else if(direction == tileDirections.R)
+            {
+                return board[x, yPlus];
+            }
+            else if(direction == tileDirections.BR)
+            {
+                return board[xPlus, yPlus];
+            }
+            else if(direction == tileDirections.BL)
+            {
+                return board[xPlus, y];
+            }
+            else if (direction == tileDirections.L)
+            {
+                return board[x, yMinus];
+            }
+        }
+        else
+        {
+            if (direction == tileDirections.TL)
+            {
+                return board[xMinus, yMinus];
+            }
+            else if (direction == tileDirections.TR)
+            {
+                return board[xMinus, y];
+            }
+            else if (direction == tileDirections.R)
+            {
+                return board[x, yPlus];
+            }
+            else if (direction == tileDirections.BR)
+            {
+                return board[xPlus, y];
+            }
+            else if (direction == tileDirections.BL)
+            {
+                return board[xPlus, yMinus];
+            }
+            else if (direction == tileDirections.L)
+            {
+                return board[x, yMinus];
             }
         }
         return board[x, y];
     }
 
+
+    /// <summary>
+    /// Returns neighbor based on the direction and the current tile
+    /// </summary>
+    /// <param name="direction">Direction of neighbor to return</param>
+    /// <param name="tile">Current tile</param>
+    /// <returns></returns>
+    public Tile getNeighborByDirection(tileDirections direction, Tile tile)
+    {
+        System.String name = tile.gameObject.name;
+        int commaBreak = name.IndexOf(',');
+        int x1 = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
+        int y1 = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
+        return getNeighborByDirection(direction,y1,x1);
+    }
+
+    /// <summary>
+    /// Loads board state from an XML file
+    /// </summary>
+    /// <param name="fileName">Filename of a valid XML save</param>
+    public void loadBoardState(string fileName)
+    {
+        XmlDocument doc = new XmlDocument();
+        doc.Load(fileName);
+        XmlNode headOfDoc = doc.FirstChild;
+        for(int i = 0; i<boardSize; i++)
+        {
+            XmlNode row = headOfDoc.ChildNodes[i];
+            for(int j = 0; j<boardSize; j++)
+            {
+
+                XmlNode tile = row.ChildNodes[j];
+                board[i,j].setType = (Tile.tileType)Tile.typeNames.IndexOf(tile.Attributes.GetNamedItem("type").InnerText);
+                if (board[i, j].setType == Tile.tileType.DeepWater) {
+                    board[i, j].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/PlainTexture");
+                }
+                else if(board[i,j].setType == Tile.tileType.Grass)
+                {
+                    board[i, j].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/GrassTex");
+                }
+                else if(board[i,j].setType == Tile.tileType.Ice)
+                {
+                    board[i, j].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/IceTex");
+                }
+                else if(board[i,j].setType == Tile.tileType.ShallowWater)
+                {
+                    board[i, j].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                }
+                board[i, j].wealth = System.Convert.ToInt32(tile.Attributes.GetNamedItem("wealth").InnerText);
+                board[i, j].food = System.Convert.ToInt32(tile.Attributes.GetNamedItem("food").InnerText);
+                
+            }
+        }
+        GameObject.Find("Mini").GetComponent<MiniMap>().generateMiniMap();
+    }
+
+    /// <summary>
+    /// Saves board state into an XML file
+    /// </summary>
+    public void saveBoardState()
+    {
+        string directory = System.IO.Directory.GetCurrentDirectory();
+        if (!System.IO.Directory.Exists(directory + "\\LocalSaves"))
+        {
+            System.IO.Directory.CreateDirectory(directory + "\\LocalSaves");
+        }
+        XmlDocument doc = new XmlDocument();
+        XmlElement boardElement = doc.CreateElement("Board");
+        for(int i = 0; i < boardSize; i++)
+        {
+            XmlElement boardCol = doc.CreateElement("Col");
+            for(int j = 0; j< boardSize; j++)
+            {
+                XmlElement tileElement = doc.CreateElement("Tile");
+                tileElement.SetAttribute("type", board[i, j].setType.ToString());
+                tileElement.SetAttribute("wealth", board[i, j].wealth.ToString());
+                tileElement.SetAttribute("food", board[i, j].food.ToString());
+                int waterDirections = 0;
+                for (int k = 0; k<6; k++)
+                {
+                    waterDirections = waterDirections << k;
+                    waterDirections += System.Convert.ToInt32(board[i, j].waterDirections[k]);
+                }
+                tileElement.SetAttribute("RiverOnTile", waterDirections.ToString());
+                boardCol.AppendChild(tileElement);
+            }
+            boardElement.AppendChild(boardCol);
+        }
+        doc.AppendChild(boardElement);
+        doc.Save(directory + "\\LocalSaves\\" + System.IO.Path.GetRandomFileName() + ".save");
+    }
+
+
+    /// <summary>
+    /// Generates two ice poles on the top and bottom of the map
+    /// </summary>
     public void GenerateIcePoles()
     {
         float startX = (boardSize / 2) * tileWidth * -1;
@@ -60,6 +218,10 @@ public class BoardManager : MonoBehaviour {
         GenerateIce(iceX, boardSize - 1, 100);
     }
 
+
+    /// <summary>
+    /// Generates continents on the map, favouring a large land mass and multiple smaller ones
+    /// </summary>
     public void GenerateContinents()
     {
         int continentP = 100;
@@ -90,6 +252,10 @@ public class BoardManager : MonoBehaviour {
         }
     }
 
+
+    /// <summary>
+    /// Surrounds all land with shallow water
+    /// </summary>
     public void PlaceShallowWater()
     {
         for (int x = 0; x < boardSize; x++)
@@ -155,6 +321,10 @@ public class BoardManager : MonoBehaviour {
         }
     }
 
+
+    /// <summary>
+    /// Places rivers on the map
+    /// </summary>
     public void PlaceRivers()
     {
         for (int i = 0; i < 5; i++)
@@ -171,6 +341,12 @@ public class BoardManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Function for handling generating a river
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="start"></param>
     void GenerateRiver(int x, int y, bool start=true){
         const int maxTries = 12;
 
@@ -472,7 +648,6 @@ public class BoardManager : MonoBehaviour {
 
     public int distanceBetweenTiles(Tile t1, Tile t2)
     {
-        Debug.Log(t1.gameObject.name + " and " + t2.gameObject.name);
 
         System.String name = t1.gameObject.name;
         int commaBreak = name.IndexOf(',');
@@ -484,45 +659,6 @@ public class BoardManager : MonoBehaviour {
         int x2 = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
         int y2 = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
         return distanceBetweenTiles(x1, x2, y1, y2);
-    }
-
-    public void markTilesInRadius(int radius, int centerX, int centerY)
-    {
-        MeshRenderer currentMesh = board[centerX, centerY].GetComponent<MeshRenderer>();
-        if (radius < 0 || board[centerX,centerY].setType != Tile.tileType.Grass) return;
-        int materialCount = currentMesh.materials.Length;
-        List<Material> materialList = new List<Material>();
-        for (int i = 0; i < materialCount; i++)
-        {
-            materialList.Add(currentMesh.materials[i]);
-        }
-        materialList.Add((Material)Resources.Load("Models/Materials/Highlight"));
-        currentMesh.materials = materialList.ToArray();
-
-        int xPlus = (centerX + 1 < boardSize) ? (centerX + 1) : 0;
-        int xMinus = (centerX - 1 >= 0) ? (centerX - 1) : (boardSize - 1);
-        int yPlus = (centerY + 1 < boardSize) ? (centerY + 1) : 0;
-        int yMinus = (centerY - 1 >= 0) ? (centerY - 1) : (boardSize - 1);
-
-        if (centerX % 2 == 0)
-        {
-            markTilesInRadius(radius - 1, xPlus, centerY);
-            markTilesInRadius(radius - 1, xPlus, yPlus);
-            markTilesInRadius(radius - 1, centerX, yPlus);
-            markTilesInRadius(radius - 1, xMinus, yPlus);
-            markTilesInRadius(radius - 1, xMinus, centerY);
-            markTilesInRadius(radius - 1, centerX, yMinus);
-        }
-        else
-        {
-            markTilesInRadius(radius - 1, xPlus, yMinus);
-            markTilesInRadius(radius - 1, xPlus, centerY);
-            markTilesInRadius(radius - 1, centerX, yPlus);
-            markTilesInRadius(radius - 1, xMinus, centerY);
-            markTilesInRadius(radius - 1, xMinus, yMinus);
-            markTilesInRadius(radius - 1, centerX, yMinus);
-        }
-
     }
 
     public void unmarkTilesInRadius(int radius, int centerX, int centerY)
@@ -564,7 +700,7 @@ public class BoardManager : MonoBehaviour {
         }
     }
 
-    public void claimTile(Tile toClaim,Player owner, int radius)
+        public void claimTile(Tile toClaim,Player owner, int radius)
     {
 
         System.String name = toClaim.gameObject.name;
@@ -615,5 +751,139 @@ public class BoardManager : MonoBehaviour {
             }
         }
 
+    }
+
+    public void markMovement(List<Tile.tileType> blockType, int speed, Tile unitTile, Tile currentTile)
+    {
+        if (speed < 0 || (unitTile != currentTile && blockType.Contains(currentTile.setType))) return;
+
+        for (int i = 0; i < 6; i++)
+        {
+            markMovement(blockType, speed - 1, unitTile, getNeighborByDirection((tileDirections)i, currentTile));
+        }
+        if (unitTile != currentTile)
+        {
+            System.String name = currentTile.gameObject.name;
+            int commaBreak = name.IndexOf(',');
+            int x1 = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
+            int y1 = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
+            
+            MeshRenderer currentMesh = board[y1, x1].GetComponent<MeshRenderer>();
+            int materialCount = currentMesh.materials.Length;
+            List<Material> materialList = new List<Material>();
+            for (int i = 0; i < materialCount; i++)
+            {
+                if (currentMesh.materials[i].name == "Highlight (Instance)") return;
+                materialList.Add(currentMesh.materials[i]);
+            }
+            materialList.Add((Material)Resources.Load("Models/Materials/Highlight"));
+            currentMesh.materials = materialList.ToArray();
+        }
+       
+    }
+    /// <summary>
+    /// Get the path from start to end
+    /// </summary>
+    /// <param name="start">Tile to start path from</param>
+    /// <param name="end">Tile to end path at</param>
+    /// <returns></returns>
+    public Stack<Tile> getPath(Tile start, Tile end)
+    {
+        SimplePriorityQueue<Tile> frontier = new SimplePriorityQueue<Tile>();
+        frontier.Enqueue(start, 0);
+        Dictionary<Tile, Tile> cameFrom = new Dictionary<Tile, Tile>();
+        Dictionary<Tile, int> costSoFar = new Dictionary<Tile, int>();
+        cameFrom.Add(start, null);
+        costSoFar.Add(start, 0);
+
+        while(!(frontier.Count == 0)){
+            Tile current = frontier.Dequeue();
+            if (current == end) break;
+
+            for(int i =0; i<6; i++)
+            {
+                Tile next = getNeighborByDirection((tileDirections)i, current);
+                int tileCost = 1;
+                if (next.setType == Tile.tileType.Ice || next.setType == Tile.tileType.ShallowWater || next.setType == Tile.tileType.DeepWater) tileCost = 100;
+
+
+
+                int newCost = costSoFar[current] + tileCost;
+                if(!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
+                {
+                    
+                    if (costSoFar.ContainsKey(next)) costSoFar[next] = newCost;
+                    else costSoFar.Add(next, newCost);
+
+                    int priority = newCost + distanceBetweenTiles(end, next);
+                    if (frontier.Contains(next)) frontier.UpdatePriority(next, priority);
+                    else frontier.Enqueue(next, priority);
+
+                    if (cameFrom.ContainsKey(next)) cameFrom[next] = current;
+                    else cameFrom.Add(next, current);
+                }
+            }
+        }
+
+        Stack<Tile> path = new Stack<Tile>();
+        Tile nextInPath = end;
+        path.Push(nextInPath);
+        while(nextInPath != start)
+        {
+            nextInPath = cameFrom[nextInPath];
+            path.Push(nextInPath);
+        }
+        return path;
+    }
+
+
+    /// <summary>
+    /// Checks the lowest cost path from start to end and sees if it is within the max movement
+    /// </summary>
+    /// <param name="start">The tile the path begins from</param>
+    /// <param name="end">The tile the path ends on</param>
+    /// <param name="maxMove">Maximum expendible movement</param>
+    /// <returns></returns>
+    public bool isMovePossible(Tile start, Tile end, Unit currentUnit)
+    {
+        
+        SimplePriorityQueue<Tile> frontier = new SimplePriorityQueue<Tile>();
+        frontier.Enqueue(start, 0);
+        Dictionary<Tile, Tile> cameFrom = new Dictionary<Tile, Tile>();
+        Dictionary<Tile, int> costSoFar = new Dictionary<Tile, int>();
+        cameFrom.Add(start, null);
+        costSoFar.Add(start, 0);
+
+        while (!(frontier.Count == 0))
+        {
+            Tile current = frontier.Dequeue();
+            if (current == end) break;
+
+            for (int i = 0; i < 6; i++)
+            {
+                Tile next = getNeighborByDirection((tileDirections)i, current);
+                int tileCost = 1;
+                if (!currentUnit.allowedTiles.Contains(next.setType)) tileCost = 100;
+
+
+
+                int newCost = costSoFar[current] + tileCost;
+                if (!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
+                {
+
+                    if (costSoFar.ContainsKey(next)) costSoFar[next] = newCost;
+                    else costSoFar.Add(next, newCost);
+
+                    int priority = newCost + distanceBetweenTiles(end, next);
+                    if (frontier.Contains(next)) frontier.UpdatePriority(next, priority);
+                    else frontier.Enqueue(next, priority);
+
+                    if (cameFrom.ContainsKey(next)) cameFrom[next] = current;
+                    else cameFrom.Add(next, current);
+                }
+            }
+        }
+
+        return (currentUnit.speed < costSoFar[end]);
     }
 }

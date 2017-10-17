@@ -35,19 +35,19 @@ public class CameraControllerPC : MonoBehaviour {
             
             if (mousePos.x > 0 && mousePos.y > 0 && mousePos.x < Screen.width && mousePos.y < Screen.height)
             {
-                if (mousePos.x < Screen.width * 0.25)
+                if (mousePos.x < Screen.width * 0.05)
                 {
                     transform.Translate(-0.1f, 0, 0);
                 }
-                else if (mousePos.x > Screen.width * 0.75)
+                else if (mousePos.x > Screen.width * 0.95)
                 {
                     transform.Translate(0.1f, 0, 0);
                 }
-                if (mousePos.y < Screen.height * 0.25)
+                if (mousePos.y < Screen.height * 0.05)
                 {
                     transform.Translate(0, -0.1f, 0);
                 }
-                else if (mousePos.y > Screen.height * 0.75)
+                else if (mousePos.y > Screen.height * 0.95)
                 {
                     transform.Translate(0, 0.1f, 0);
                 }
@@ -147,6 +147,15 @@ public class CameraControllerPC : MonoBehaviour {
         if (Input.GetMouseButtonUp(0))
         { 
             
+        }
+        if (Input.GetKeyDown("s"))
+        {
+            GameObject.Find("BoardGenerator").GetComponent<BoardManager>().saveBoardState();
+        }
+        else if (Input.GetKeyDown("l"))
+        {
+            string directory = System.IO.Directory.GetCurrentDirectory();
+            GameObject.Find("BoardGenerator").GetComponent<BoardManager>().loadBoardState(directory + "\\LocalSaves\\test.save");
         }
     }
 

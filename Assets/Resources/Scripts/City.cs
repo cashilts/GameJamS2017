@@ -29,17 +29,34 @@ public class City : BoardObject {
         Camera.main.GetComponent<CameraControllerPC>().changeMode(CameraControllerPC.inputModes.INMENU);
         newCityMenu.GetComponent<CityMenu>().addOptionToMenu(new CityOption.clickOption(startProductionOnUnit), "Settler","Settler: " + (int)(new Settler().buildCost/production) + " turns");
         newCityMenu.GetComponent<CityMenu>().addOptionToMenu(new CityOption.clickOption(startProductionOnUnit), "Warrior", "Warrior: " + (int)(new Warrior().buildCost/production) + " turns");
+        for (int i = 0; i < 6; i++)
+        {
+            Tile checkTile = transform.parent.parent.GetComponent<BoardManager>().getNeighborByDirection((BoardManager.tileDirections)i, transform.parent.GetComponent<Tile>());
+            if (checkTile.setType == Tile.tileType.ShallowWater)
+            {
+                newCityMenu.GetComponent<CityMenu>().addOptionToMenu(new CityOption.clickOption(startProductionOnUnit), "boat", "Boat: " + (int)(new Boat().buildCost / production) + " turns");
+                break;
+            }
+        }
     }
 
     public void spawnUnit()
     {
+        
         Unit unitScript = unitInProduction.GetComponent<Unit>();
         unitInProduction.newTurn();
         unitInProduction.gameObject.SetActive(true);
         transform.parent.GetComponent<Tile>().addUnitsToTile(unitScript);
         owner.giveUnit(unitScript);
         unitScript.ownerIndex = ownerIndex;
-        unitScript.transform.Find("Cube").GetComponent<SkinnedMeshRenderer>().materials[0].SetColor("_Color", owner.playerColor);
+        if (unitScript.transform.Find("Cube").GetComponent<SkinnedMeshRenderer>() == null)
+        {
+            unitScript.transform.Find("Cube").GetComponent<MeshRenderer>().materials[0].SetColor("_Color", owner.playerColor);
+        }
+        else
+        {
+            unitScript.transform.Find("Cube").GetComponent<SkinnedMeshRenderer>().materials[0].SetColor("_Color", owner.playerColor);
+        }
 
     }
 

@@ -47,6 +47,11 @@ public class Player : MonoBehaviour {
         ownedUnits.Add(unit);
     }
 
+    public void removeUnit(Unit unit)
+    {
+        ownedUnits.Remove(unit);
+    }
+
     public void giveCity(City city)
     {
         ownedCities.Add(city);

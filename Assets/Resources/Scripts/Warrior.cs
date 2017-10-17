@@ -54,12 +54,27 @@ public class Warrior : Unit
             return "attack";
         }
     }
+    int _health = 3;
+    public override int health
+    {
+
+
+        get
+        {
+            return _health;
+        }
+
+        set
+        {
+            _health = value;
+        }
+    }
     #endregion
 
 
     // Use this for initialization
     void Start () {
-		
+        allowedTiles.Add(Tile.tileType.Grass);
 	}
 	
 	// Update is called once per frame
@@ -75,19 +90,40 @@ public class Warrior : Unit
 
     public void attackStart()
     {
-        System.String name = transform.parent.gameObject.name;
-        int commaBreak = name.IndexOf(',');
-        int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
-        int y = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
-        transform.parent.parent.GetComponent<BoardManager>().markTilesInRadius(attackRange, y, x);
-        Destroy(unitMenu.gameObject);
-        Camera.main.GetComponent<CameraControllerPC>().changeMode(CameraControllerPC.inputModes.ACTIONTARGET);
-        Camera.main.GetComponent<CameraControllerPC>().setActionTarget(new CameraControllerPC.targetSelectMethod(attackEnd));
+        if (hasAttack)
+        {
+            System.String name = transform.parent.gameObject.name;
+            int commaBreak = name.IndexOf(',');
+            int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
+            int y = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
+            List<Tile.tileType> bannedList = new List<Tile.tileType>();
+            transform.parent.parent.GetComponent<BoardManager>().markMovement(bannedList, attackRange, transform.parent.GetComponent<Tile>(), transform.parent.GetComponent<Tile>());
+            Destroy(unitMenu.gameObject);
+            Camera.main.GetComponent<CameraControllerPC>().changeMode(CameraControllerPC.inputModes.ACTIONTARGET);
+            Camera.main.GetComponent<CameraControllerPC>().setActionTarget(new CameraControllerPC.targetSelectMethod(attackEnd));
+        }
     }
 
     public void attackEnd(Tile endAttack)
     {
-
+        System.String name = transform.parent.gameObject.name;
+        int commaBreak = name.IndexOf(',');
+        int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
+        int y = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
+        transform.parent.parent.GetComponent<BoardManager>().unmarkTilesInRadius(attackRange, y, x);
+        if (!(endAttack.unitsOnTile.Count == 0) && !(endAttack.unitsOnTile[0].ownerIndex == ownerIndex))
+        {
+            endAttack.unitsOnTile[0].health -= baseAttack - endAttack.unitsOnTile[0].baseDefense;
+            if (endAttack.unitsOnTile[0].health < 0)
+            {
+                Unit killed = endAttack.unitsOnTile[0];
+                Destroy(endAttack.unitsOnTile[0].gameObject);
+                endAttack.removeUnit(killed);
+                killed.owner.removeUnit(killed);
+            }
+            hasAttack = false;
+        }
+        Camera.main.GetComponent<CameraControllerPC>().changeMode(CameraControllerPC.inputModes.TILESELECT);
     }
 
     public override void newTurn()
