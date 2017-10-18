@@ -152,8 +152,9 @@ public class BoardManager : MonoBehaviour {
     /// <summary>
     /// Saves board state into an XML file
     /// </summary>
-    public void saveBoardState()
+    public void saveBoardState(string filename)
     {
+        
         string directory = System.IO.Directory.GetCurrentDirectory();
         if (!System.IO.Directory.Exists(directory + "\\LocalSaves"))
         {
@@ -182,7 +183,8 @@ public class BoardManager : MonoBehaviour {
             boardElement.AppendChild(boardCol);
         }
         doc.AppendChild(boardElement);
-        doc.Save(directory + "\\LocalSaves\\" + System.IO.Path.GetRandomFileName() + ".save");
+        doc.Save(directory + "\\LocalSaves\\" + filename + ".save");
+        
     }
 
 

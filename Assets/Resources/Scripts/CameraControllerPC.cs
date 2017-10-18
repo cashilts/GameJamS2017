@@ -10,7 +10,7 @@ public class CameraControllerPC : MonoBehaviour {
     Tile startTile;
     RadialMenu openMenu = null;
     RadialButton selectedButton;
-    public enum inputModes {TILESELECT,ACTIONTARGET,INMENU};
+    public enum inputModes {TILESELECT,ACTIONTARGET,INMENU, TEXTENTRY};
     inputModes currentInputMode = inputModes.TILESELECT;
     targetSelectMethod onActionTarget;
     Canvas tileInfoTab;
@@ -53,109 +53,116 @@ public class CameraControllerPC : MonoBehaviour {
                 }
             }
         }
-        Vector2 mouseScroll = Input.mouseScrollDelta;
-        transform.Translate(0, 0, mouseScroll.y);
-        mousePos.Set(mousePos.x, mousePos.y, 1);
-        mousePos = GetComponent<Camera>().ScreenToWorldPoint(mousePos);
-        Vector3 mouseTouchPoint = mousePos;
-        mouseTouchPoint = transform.position - mouseTouchPoint;
-        mouseTouchPoint.Normalize();
-        RaycastHit hit;
-        
-        if (Physics.Raycast(transform.position, mouseTouchPoint*-1, out hit, 50))
-        {
-            GameObject currentlySelected = hit.collider.gameObject;
-            Tile newSelectedTile = currentlySelected.GetComponent<Tile>();
-            if(newSelectedTile == null)
+        if (!(currentInputMode == inputModes.TEXTENTRY)){
+            Vector2 mouseScroll = Input.mouseScrollDelta;
+            transform.Translate(0, 0, mouseScroll.y);
+            mousePos.Set(mousePos.x, mousePos.y, 1);
+            mousePos = GetComponent<Camera>().ScreenToWorldPoint(mousePos);
+            Vector3 mouseTouchPoint = mousePos;
+            mouseTouchPoint = transform.position - mouseTouchPoint;
+            mouseTouchPoint.Normalize();
+            RaycastHit hit;
+
+            if (Physics.Raycast(transform.position, mouseTouchPoint * -1, out hit, 50))
             {
-                selectedTile = null;
-                tileInfoTab.gameObject.SetActive(false);
-                selectedButton = currentlySelected.GetComponent<RadialButton>();
-            }
-            else
-            {
-                if(newSelectedTile == selectedTile)
+                GameObject currentlySelected = hit.collider.gameObject;
+                Tile newSelectedTile = currentlySelected.GetComponent<Tile>();
+                if (newSelectedTile == null)
                 {
-                    hoverCount++;
-                    if(hoverCount > 45)
+                    selectedTile = null;
+                    tileInfoTab.gameObject.SetActive(false);
+                    selectedButton = currentlySelected.GetComponent<RadialButton>();
+                }
+                else
+                {
+                    if (newSelectedTile == selectedTile)
                     {
-                        tileInfoTab.transform.position = mousePos;
-                        tileInfoTab.transform.Find("TileStats").GetComponent<Text>().text = "Wealth: " + selectedTile.wealth + "\n" + "Food: " + selectedTile.food; ;
-                        tileInfoTab.gameObject.SetActive(true);
+                        hoverCount++;
+                        if (hoverCount > 45)
+                        {
+                            tileInfoTab.transform.position = mousePos;
+                            tileInfoTab.transform.Find("TileStats").GetComponent<Text>().text = "Wealth: " + selectedTile.wealth + "\n" + "Food: " + selectedTile.food; ;
+                            tileInfoTab.gameObject.SetActive(true);
+                        }
+                    }
+                    else
+                    {
+                        selectedTile = newSelectedTile;
+                        tileInfoTab.gameObject.SetActive(false);
+                        hoverCount = 0;
+                    }
+
+
+                }
+                //If the currently selected mesh is hit again, don't update the texture
+                if (currentlySelected != previouslySelected)
+                {
+
+                    //Add on a highlight to the selected tile to show it got hit
+                    /*Material[] newMaterials = new Material[2];
+                    newMaterials[0] = currentMesh.material;
+                    newMaterials[1] = (Material)Resources.Load("Models/Materials/Highlight");
+                    currentMesh.materials = newMaterials;
+                    newMaterials = new Material[1];
+                    newMaterials[0] = previousMesh.materials[0];
+                    previousMesh.materials = newMaterials; */
+                    previouslySelected = currentlySelected;
+                }
+            }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (currentInputMode == inputModes.TILESELECT)
+                {
+                    if (selectedTile != null && openMenu != null)
+                    {
+                        Destroy(openMenu.gameObject);
+                        selectedButton = null;
+                    }
+                    else if (selectedTile == null && selectedButton != null)
+                    {
+                        selectedButton.onClick();
+                    }
+                    else
+                    {
+                        startTile = selectedTile;
+                        startTile.onMouseButtonDown();
                     }
                 }
-                else
+                else if (currentInputMode == inputModes.ACTIONTARGET)
                 {
-                    selectedTile = newSelectedTile;
-                    tileInfoTab.gameObject.SetActive(false);
-                    hoverCount = 0;
+                    if (selectedTile != null && onActionTarget != null)
+                    {
+                        onActionTarget(selectedTile);
+                    }
                 }
-                
-                
+                else if (currentInputMode == inputModes.INMENU)
+                {
+                    if (Input.mousePosition.x < Screen.width / 2)
+                    {
+                        Destroy(GameObject.Find("CityMenu"));
+                        changeMode(inputModes.TILESELECT);
+                    }
+                }
             }
-            //If the currently selected mesh is hit again, don't update the texture
-            if (currentlySelected != previouslySelected)
+            if (Input.GetMouseButtonUp(0))
             {
 
-                //Add on a highlight to the selected tile to show it got hit
-                /*Material[] newMaterials = new Material[2];
-                newMaterials[0] = currentMesh.material;
-                newMaterials[1] = (Material)Resources.Load("Models/Materials/Highlight");
-                currentMesh.materials = newMaterials;
-                newMaterials = new Material[1];
-                newMaterials[0] = previousMesh.materials[0];
-                previousMesh.materials = newMaterials; */
-                previouslySelected = currentlySelected;
             }
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (currentInputMode == inputModes.TILESELECT)
+            if (Input.GetKeyDown("s"))
             {
-                if (selectedTile != null && openMenu != null)
-                {
-                    Destroy(openMenu.gameObject);
-                    selectedButton = null;
-                }
-                else if (selectedTile == null && selectedButton != null)
-                {
-                    selectedButton.onClick();
-                }
-                else
-                {
-                    startTile = selectedTile;
-                    startTile.onMouseButtonDown();
-                }
+                GameObject InputPanel = Instantiate((GameObject)Resources.Load("Prefabs/InputPanel"));
+                InputPanel.name = "InputPanel";
+                InputPanel.transform.SetParent(GameObject.Find("Canvas").transform, false);
+                TextInput.stringFunction saveCallback = new TextInput.stringFunction(GameObject.Find("BoardGenerator").GetComponent<BoardManager>().saveBoardState);
+                InputPanel.GetComponent<TextInput>().setCallback(saveCallback);
+                changeMode(inputModes.TEXTENTRY);
             }
-            else if(currentInputMode == inputModes.ACTIONTARGET)
+            else if (Input.GetKeyDown("l"))
             {
-                if(selectedTile != null && onActionTarget != null)
-                {
-                    onActionTarget(selectedTile);
-                }
+                string directory = System.IO.Directory.GetCurrentDirectory();
+                GameObject.Find("BoardGenerator").GetComponent<BoardManager>().loadBoardState(directory + "\\LocalSaves\\test.save");
             }
-            else if (currentInputMode == inputModes.INMENU)
-            {
-                if (Input.mousePosition.x < Screen.width / 2)
-                {
-                    Destroy(GameObject.Find("CityMenu"));
-                    changeMode(inputModes.TILESELECT);
-                }
-            }
-        }
-        if (Input.GetMouseButtonUp(0))
-        { 
-            
-        }
-        if (Input.GetKeyDown("s"))
-        {
-            GameObject.Find("BoardGenerator").GetComponent<BoardManager>().saveBoardState();
-        }
-        else if (Input.GetKeyDown("l"))
-        {
-            string directory = System.IO.Directory.GetCurrentDirectory();
-            GameObject.Find("BoardGenerator").GetComponent<BoardManager>().loadBoardState(directory + "\\LocalSaves\\test.save");
         }
     }
 
