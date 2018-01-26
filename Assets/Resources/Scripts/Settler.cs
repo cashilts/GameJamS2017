@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 
 public class Settler : Unit {
@@ -99,7 +100,6 @@ public class Settler : Unit {
             owner.giveCity(newCity.GetComponent<City>());
             owner.removeUnit(this);
             newCity.GetComponent<City>().owner = owner;
-            newCity.GetComponent<City>().ownerIndex = ownerIndex;
             if (unitMenu != null)
             {
                 Destroy(unitMenu.gameObject);
@@ -111,5 +111,14 @@ public class Settler : Unit {
     public override void newTurn()
     {
         speed = baseSpeed;
+    }
+
+    public override XmlElement saveUnit(ref XmlDocument doc)
+    {
+        XmlElement newElement = doc.CreateElement("Settler");
+        newElement.SetAttribute("speed", speed.ToString());
+        newElement.SetAttribute("health", health.ToString());
+        newElement.SetAttribute("Owner", owner.id.ToString());
+        return newElement;
     }
 }

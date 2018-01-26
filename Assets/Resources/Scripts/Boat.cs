@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 
 public class Boat : Unit {
@@ -47,7 +48,7 @@ public class Boat : Unit {
     {
         get
         {
-            return "boat";
+            return "sailboat";
         }
     }
     protected override int baseSpeed
@@ -164,5 +165,14 @@ public class Boat : Unit {
     public override void newTurn()
     {
         speed = baseSpeed;
+    }
+
+    public override XmlElement saveUnit(ref XmlDocument doc)
+    {
+        XmlElement newElement = doc.CreateElement("Boat");
+        newElement.SetAttribute("speed", speed.ToString());
+        newElement.SetAttribute("health", health.ToString());
+        newElement.SetAttribute("Owner", owner.id.ToString());
+        return newElement;
     }
 }

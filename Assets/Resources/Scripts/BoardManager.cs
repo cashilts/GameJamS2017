@@ -5,11 +5,13 @@ using UnityEngine;
 using System.Xml;
 using Priority_Queue;
 
-public class BoardManager : MonoBehaviour {
+public class BoardManager : Singleton<BoardManager> {
    
     public const float tileWidth = 1.7f;
     public const float tileHeight = 1.5f;
     public const int boardSize = 100;
+
+
     int grassTiles = 0;
     Tile[,] board = new Tile[boardSize,boardSize];  
     public enum tileDirections { TL,TR,R,BR,BL,L};
@@ -160,29 +162,23 @@ public class BoardManager : MonoBehaviour {
         {
             System.IO.Directory.CreateDirectory(directory + "\\LocalSaves");
         }
+
+
+
         XmlDocument doc = new XmlDocument();
+        XmlElement game = doc.CreateElement("Game");
+        game.AppendChild(CameraController.Instance.saveCamera(ref doc));
+
         XmlElement boardElement = doc.CreateElement("Board");
         for(int i = 0; i < boardSize; i++)
         {
-            XmlElement boardCol = doc.CreateElement("Col");
             for(int j = 0; j< boardSize; j++)
-            {
-                XmlElement tileElement = doc.CreateElement("Tile");
-                tileElement.SetAttribute("type", board[i, j].setType.ToString());
-                tileElement.SetAttribute("wealth", board[i, j].wealth.ToString());
-                tileElement.SetAttribute("food", board[i, j].food.ToString());
-                int waterDirections = 0;
-                for (int k = 0; k<6; k++)
-                {
-                    waterDirections = waterDirections << k;
-                    waterDirections += System.Convert.ToInt32(board[i, j].waterDirections[k]);
-                }
-                tileElement.SetAttribute("RiverOnTile", waterDirections.ToString());
-                boardCol.AppendChild(tileElement);
+            { 
+                boardElement.AppendChild(board[i,j].saveTile(ref doc));
             }
-            boardElement.AppendChild(boardCol);
         }
-        doc.AppendChild(boardElement);
+        game.AppendChild(boardElement);
+        doc.AppendChild(game);
         doc.Save(directory + "\\LocalSaves\\" + filename + ".save");
         
     }
@@ -273,34 +269,34 @@ public class BoardManager : MonoBehaviour {
 
                     if (board[xMinus, y].setType == Tile.tileType.Grass)
                     {
-                        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                        board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/SWater");
                         board[x, y].setType = Tile.tileType.ShallowWater;
                     }
                     else if (board[xPlus, y].setType == Tile.tileType.Grass)
                     {
-                        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                        board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/SWater");
                         board[x, y].setType = Tile.tileType.ShallowWater;
                     }
                     else if (board[x, yPlus].setType == Tile.tileType.Grass)
                     {
-                        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                        board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/SWater");
                         board[x, y].setType = Tile.tileType.ShallowWater;
                     }
                     else if (board[x, yMinus].setType == Tile.tileType.Grass)
                     {
-                        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                        board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/SWater");
                         board[x, y].setType = Tile.tileType.ShallowWater;
                     }
                     else if (x % 2 == 1)
                     {
                         if (board[xMinus, yMinus].setType == Tile.tileType.Grass)
                         {
-                            board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                            board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/SWater");
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
                         else if (board[xPlus, yMinus].setType == Tile.tileType.Grass)
                         {
-                            board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                            board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/SWater");
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
                     }
@@ -308,12 +304,12 @@ public class BoardManager : MonoBehaviour {
                     {
                         if (board[xPlus, yPlus].setType == Tile.tileType.Grass)
                         {
-                            board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                            board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/SWater");
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
                         else if (board[xMinus, yPlus].setType == Tile.tileType.Grass)
                         {
-                            board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
+                            board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/SWater");
                             board[x, y].setType = Tile.tileType.ShallowWater;
                         }
                     }
@@ -466,7 +462,7 @@ public class BoardManager : MonoBehaviour {
     void GenerateContinent(int x, int y, float p){
         grassTiles++;
         board[x, y].setType = Tile.tileType.Grass;
-        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/GrassTex");
+        board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/GrassTex");
         if (Random.Range(0, 100) <= p)
         {
             if (x - 1 >= 0)
@@ -515,7 +511,7 @@ public class BoardManager : MonoBehaviour {
 
     void GenerateIce(int x, int y, float p) {
         board[x, y].setType = Tile.tileType.Ice;
-        board[x, y].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/IceTex");
+        board[x, y].GetComponent<MeshRenderer>().material = Resources.Load<Material>("Models/Materials/IceTex");
         if (Random.Range(0, 100) <= p)
         {
             if (x - 1 >= 0) {
@@ -550,7 +546,7 @@ public class BoardManager : MonoBehaviour {
 
     public void spawnStartUnits()
     {
-        GameManager manager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        GameManager manager = GameManager.Instance;
         for(int i = 0; i<2; i++)
         {
             int spawnX = Random.Range(0, boardSize);
@@ -559,7 +555,7 @@ public class BoardManager : MonoBehaviour {
                 spawnX = Random.Range(0, boardSize);
                 spawnY = Random.Range(0, boardSize);
             }
-            GameObject newSettler = Instantiate((GameObject)Resources.Load("Prefabs/Settler"));
+            GameObject newSettler = Instantiate(Resources.Load<GameObject>("Prefabs/Settler"));
             newSettler.name = "Settler" + i;
             newSettler.GetComponent<Settler>().ownerIndex = i;
             if(i == 0)
@@ -778,7 +774,7 @@ public class BoardManager : MonoBehaviour {
                 if (currentMesh.materials[i].name == "Highlight (Instance)") return;
                 materialList.Add(currentMesh.materials[i]);
             }
-            materialList.Add((Material)Resources.Load("Models/Materials/Highlight"));
+            materialList.Add(Resources.Load<Material>("Models/Materials/Highlight"));
             currentMesh.materials = materialList.ToArray();
         }
        

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 
 public class Warrior : Unit
@@ -51,7 +52,7 @@ public class Warrior : Unit
     {
         get
         {
-            return "attack";
+            return "club";
         }
     }
     int _health = 3;
@@ -85,7 +86,7 @@ public class Warrior : Unit
     public override void onSelect()
     {
         base.onSelect();
-        unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(attackStart), Resources.Load<Sprite>("Images/attack"));
+        unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(attackStart), Resources.Load<Sprite>("Images/club"));
     }
 
     public void attackStart()
@@ -97,7 +98,7 @@ public class Warrior : Unit
             int x = System.Convert.ToInt32(name.Substring(4, commaBreak - 4));
             int y = System.Convert.ToInt32(name.Substring(commaBreak + 1, name.Length - 1 - commaBreak));
             List<Tile.tileType> bannedList = new List<Tile.tileType>();
-            transform.parent.parent.GetComponent<BoardManager>().markMovement(bannedList, attackRange, transform.parent.GetComponent<Tile>(), transform.parent.GetComponent<Tile>());
+            BoardManager.Instance.markMovement(bannedList, attackRange, transform.parent.GetComponent<Tile>(), transform.parent.GetComponent<Tile>());
             Destroy(unitMenu.gameObject);
             Camera.main.GetComponent<CameraControllerPC>().changeMode(CameraControllerPC.inputModes.ACTIONTARGET);
             Camera.main.GetComponent<CameraControllerPC>().setActionTarget(new CameraControllerPC.targetSelectMethod(attackEnd));
@@ -130,5 +131,14 @@ public class Warrior : Unit
     {
         speed = baseSpeed;
         hasAttack = true;
+    }
+
+    public override XmlElement saveUnit(ref XmlDocument doc)
+    {
+        XmlElement newElement = doc.CreateElement("Warrior");
+        newElement.SetAttribute("speed", speed.ToString());
+        newElement.SetAttribute("health", health.ToString());
+        newElement.SetAttribute("Owner", owner.id.ToString());
+        return newElement;
     }
 }

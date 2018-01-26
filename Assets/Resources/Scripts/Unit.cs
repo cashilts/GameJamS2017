@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -52,8 +53,8 @@ public abstract class Unit : BoardObject {
         GameObject radialMenuObj = (GameObject)Instantiate(Resources.Load("Prefabs/RadialMenu"));
         radialMenuObj.transform.SetParent(transform.parent, false);
         unitMenu = radialMenuObj.GetComponent<RadialMenu>();
-        unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(startMoveUnit),Resources.Load<Sprite>("Images/walk"));
-        unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(deleteUnit), Resources.Load<Sprite>("Images/remove"));
+        unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(startMoveUnit),Resources.Load<Sprite>("Images/move"));
+        unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(deleteUnit), Resources.Load<Sprite>("Images/skull"));
 
         //Check if boats are near the unit, if so let the unit have the option to get on the boat
         if (!onBoat)
@@ -67,7 +68,7 @@ public abstract class Unit : BoardObject {
                     {
                         if (checkTile.unitsOnTile[0].GetComponent<Boat>() != null)
                         {
-                            unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(addToNearestBoat), Resources.Load<Sprite>("Images/load"));
+                            unitMenu.addOptionToMenu(new RadialButton.passDelegateNoValue(addToNearestBoat), Resources.Load<Sprite>("Images/overhead"));
                             break;
                         }
                     }
@@ -194,5 +195,11 @@ public abstract class Unit : BoardObject {
     public override void getInfo()
     {
         GameObject.Find("InfoText").GetComponent<Text>().text = this.GetType().ToString() + ":\nMovement: " + speed + "\nHealth: " + health;
+    }
+
+    public virtual XmlElement saveUnit(ref XmlDocument doc)
+    {
+        XmlElement unit = doc.CreateElement("Unit");
+        return unit;
     }
 }

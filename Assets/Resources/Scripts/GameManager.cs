@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : Singleton<GameManager> {
 
     List<Player> players = new List<Player>();
     public const int numPlayers = 2;
@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour {
         Player localScript = localPlayer.GetComponent<Player>();
         players.Add(localScript);
         localScript.playerColor = new Color(255, 0, 0, 0);
+        localScript.id = 0;
 
         for(int i = 1; i < numPlayers; i++)
         {
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour {
             Player AIScript = aiPlayer.GetComponent<Player>();
             players.Add(AIScript);
             AIScript.playerColor = new Color(0, 0, 255, 0);
+            AIScript.id = i;
         }
 	}
 

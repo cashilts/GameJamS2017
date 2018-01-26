@@ -1,20 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 using UnityEngine;
 
 public class Tile : MonoBehaviour {
+
+    //Types of tiles
+    public static readonly IList<string> typeNames = new ReadOnlyCollection<string>(new List<string> { "DeepWater", "ShallowWater", "Ice", "Grass" });
     public enum tileType { DeepWater, ShallowWater, Ice, Grass };
     public tileType setType = tileType.DeepWater;
 
+    //Water properties of rivers that permeate simple tiles, directions determines which directions a river moves through the tile
+    static readonly string[] directionNames = { "TL", "TR", "R", "BR", "BL", "L" };
     public bool[] waterDirections = new bool[6];
     public bool hasWater = false;
-    static readonly string[] directionNames = { "TL", "TR", "R", "BR", "BL", "L" };
-    public static readonly IList<string> typeNames = new ReadOnlyCollection<string>(new List<string>{"DeepWater","ShallowWater","Ice","Grass"});
+
+
     public List<Unit> unitsOnTile = new List<Unit>(5);
     public Unit selectedUnit;
     public City cityOnTile;
     public Player owner;
+
     public int wealth;
     public int food;
 
@@ -57,12 +64,12 @@ public class Tile : MonoBehaviour {
     {
         if (cityOnTile != null)
         {
-            if (unitsOnTile.Count == 0 && cityOnTile.ownerIndex == 0) cityOnTile.onSelect();
-            else if(cityOnTile.ownerIndex == 0)
+            if (unitsOnTile.Count == 0 && cityOnTile.owner.id == 0) cityOnTile.onSelect();
+            else if(cityOnTile.owner.id == 0)
             {
-                GameObject newMenu = (GameObject)Instantiate(Resources.Load("Prefabs/RadialMenu"));
+                GameObject newMenu = Instantiate(Resources.Load<GameObject>("Prefabs/RadialMenu"));
                 newMenu.transform.SetParent(transform, false);
-                newMenu.GetComponent<RadialMenu>().addOptionToMenu(new RadialButton.passDelegate(SelectUnit), -1, Resources.Load<Sprite>("Images/town"));
+                newMenu.GetComponent<RadialMenu>().addOptionToMenu(new RadialButton.passDelegate(SelectUnit), -1, Resources.Load<Sprite>("Images/village"));
                 for(int i = 0; i< unitsOnTile.Count; i++)
                 {
                     newMenu.GetComponent<RadialMenu>().addOptionToMenu(new RadialButton.passDelegate(SelectUnit), i, Resources.Load<Sprite>("Images/" + unitsOnTile[i].iconImage));
@@ -186,6 +193,40 @@ public class Tile : MonoBehaviour {
         }
         materialList.Add(owner.playerOccupiedTile);
        GetComponent<MeshRenderer>().materials = materialList.ToArray();
+    }
+
+
+    public XmlElement saveTile(ref XmlDocument doc)
+    {
+        XmlElement tileElement = doc.CreateElement("Tile");
+
+        tileElement.SetAttribute("type", setType.ToString());
+        tileElement.SetAttribute("wealth", wealth.ToString());
+        tileElement.SetAttribute("food", food.ToString());
+        int waterMask = 0;
+        for (int k = 0; k < 6; k++)
+        {
+            waterMask += System.Convert.ToInt32(waterDirections[k]);
+            waterMask = waterMask << 1;
+        }
+        tileElement.SetAttribute("RiverOnTile", waterMask.ToString());
+
+        if(owner != null)
+        {
+            tileElement.SetAttribute("Owner", owner.id.ToString());
+        }
+        if (cityOnTile)
+        {
+            tileElement.AppendChild(cityOnTile.saveCity(ref doc));
+        }
+       
+
+        foreach(Unit u in unitsOnTile)
+        {
+            tileElement.AppendChild(u.saveUnit(ref doc));
+        }
+
+        return tileElement;
     }
 
 }

@@ -27,6 +27,8 @@ public class CityOption : MonoBehaviour {
     {
         clickMethod(storedArg);
         Camera.main.GetComponent<CameraControllerPC>().changeMode(CameraControllerPC.inputModes.TILESELECT);
-        Destroy(transform.parent.parent.gameObject);
+        GameObject hud = Instantiate(Resources.Load<GameObject>("Prefabs/MapHUD"));
+        hud.name = "MapHUD";
+        Destroy(GameObject.Find("CityHUD"));
     }
 }

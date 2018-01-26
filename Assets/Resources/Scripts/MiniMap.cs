@@ -22,8 +22,7 @@ public class MiniMap : MonoBehaviour {
         		
 	}
      public void generateMiniMap() {
-        Debug.Log("Start map");
-        BoardManager boardMan = GameObject.Find("BoardGenerator").GetComponent<BoardManager>();
+        BoardManager boardMan = BoardManager.Instance;
         Texture2D myNewText = new Texture2D(100 * 3, 100 * 3);
         for (int i = 0; i < 100; i++)
         {
@@ -94,6 +93,5 @@ public class MiniMap : MonoBehaviour {
         GetComponent<Image>().sprite = Sprite.Create(myNewText, new Rect(0, 0, myNewText.width, myNewText.height), new Vector2(0.5f, 0.5f));
         //GetComponent<MeshRenderer>().material.SetTexture(Shader.PropertyToID("_MainTex"), myNewText);
         generated = true;
-        Debug.Log("endmap");
     }
 }

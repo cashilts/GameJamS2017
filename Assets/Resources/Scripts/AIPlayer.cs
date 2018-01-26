@@ -21,6 +21,7 @@ public class AIPlayer : Player {
 
     public override void doTurn()
     {
+        /*
         for(int i = 0; i<ownedUnits.Count; i++)
         {
             if (ownedUnits[i].GetType() == typeof(Settler))
@@ -46,5 +47,6 @@ public class AIPlayer : Player {
                 ownedCities[i].startProductionOnUnit("Warrior");
             }
         }
+        */
     }
 }

@@ -1,20 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CameraControllerPC : MonoBehaviour {
+public class CameraControllerPC : CameraController {
+
+    public enum inputModes { TILESELECT, ACTIONTARGET, INMENU, TEXTENTRY, CITYMENU};
+    inputModes currentInputMode = inputModes.TILESELECT;
 
     Tile selectedTile;
     GameObject previouslySelected;
     Tile startTile;
     RadialMenu openMenu = null;
     RadialButton selectedButton;
-    public enum inputModes {TILESELECT,ACTIONTARGET,INMENU, TEXTENTRY};
-    inputModes currentInputMode = inputModes.TILESELECT;
+   
     targetSelectMethod onActionTarget;
     Canvas tileInfoTab;
     int hoverCount = 0;
+    int zoom = 1;
     public delegate void targetSelectMethod(Tile tile);
 
 
@@ -153,16 +157,30 @@ public class CameraControllerPC : MonoBehaviour {
             {
                 GameObject InputPanel = Instantiate((GameObject)Resources.Load("Prefabs/InputPanel"));
                 InputPanel.name = "InputPanel";
-                InputPanel.transform.SetParent(GameObject.Find("Canvas").transform, false);
-                TextInput.stringFunction saveCallback = new TextInput.stringFunction(GameObject.Find("BoardGenerator").GetComponent<BoardManager>().saveBoardState);
+                InputPanel.transform.SetParent(GameObject.Find("MapHUD").transform, false);
+                TextInput.stringFunction saveCallback = new TextInput.stringFunction(BoardManager.Instance.saveBoardState);
                 InputPanel.GetComponent<TextInput>().setCallback(saveCallback);
                 changeMode(inputModes.TEXTENTRY);
             }
             else if (Input.GetKeyDown("l"))
             {
-                string directory = System.IO.Directory.GetCurrentDirectory();
-                GameObject.Find("BoardGenerator").GetComponent<BoardManager>().loadBoardState(directory + "\\LocalSaves\\test.save");
+                GameObject fileSelect = Instantiate((GameObject)Resources.Load("Prefabs/FileSelect"));
+                fileSelect.name = "FileSelect";
+                fileSelect.transform.SetParent(GameObject.Find("Canvas").transform, false);
+                FileSelect.fileSubmit submitCallback = new FileSelect.fileSubmit(GameObject.Find("BoardGenerator").GetComponent<BoardManager>().loadBoardState);
+                fileSelect.GetComponent<FileSelect>().setFileSelectFunction(submitCallback);
+                fileSelect.GetComponent<FileSelect>().loadDirectoryOptions(System.IO.Directory.GetCurrentDirectory());
+                changeMode(inputModes.TEXTENTRY);
             }
+            if (Input.GetKeyDown("-"))
+            {
+
+            }
+            else if (Input.GetKeyDown("+"))
+            {
+
+            }
+
         }
     }
 
@@ -184,5 +202,14 @@ public class CameraControllerPC : MonoBehaviour {
     public void inputNextTurn()
     {
         GameObject.Find("GameManager").GetComponent<GameManager>().endCurrentTurn();
+    }
+
+    public override XmlElement saveCamera(ref XmlDocument doc)
+    {
+        XmlElement cameraElement = doc.CreateElement("Camera");
+        cameraElement.SetAttribute("XPos", transform.position.x.ToString());
+        cameraElement.SetAttribute("YPos", transform.position.y.ToString());
+        cameraElement.SetAttribute("ZPos", transform.position.z.ToString());
+        return cameraElement;
     }
 }

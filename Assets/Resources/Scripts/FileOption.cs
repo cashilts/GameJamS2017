@@ -6,6 +6,8 @@ public class FileOption : MonoBehaviour {
 
     public enum optionType{SAVEFILE, DIRECTORY };
     public optionType setOptionType;
+    string optionText;
+
 
 	// Use this for initialization
 	void Start () {
@@ -19,14 +21,18 @@ public class FileOption : MonoBehaviour {
 
     public void onSelect()
     {
-        string text = transform.Find("Text").GetComponent<UnityEngine.UI.Text>().text;
         if (setOptionType == optionType.DIRECTORY)
         {
-            transform.parent.parent.GetComponent<FileSelect>().loadDirectoryOptions(text);
+            transform.parent.parent.GetComponent<FileSelect>().loadDirectoryOptions(optionText);
         }
         else
         {
-            transform.parent.parent.GetComponent<FileSelect>().selectFile(text);
+            transform.parent.parent.GetComponent<FileSelect>().selectFile(optionText);
         }
+    }
+
+    public void setOption(string text)
+    {
+        optionText = text;
     }
 }

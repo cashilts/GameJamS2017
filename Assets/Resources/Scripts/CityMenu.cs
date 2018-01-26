@@ -9,7 +9,6 @@ public class CityMenu : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
 	}
 	
 	// Update is called once per frame
@@ -23,8 +22,13 @@ public class CityMenu : MonoBehaviour {
         newCityOption.transform.GetChild(0).GetComponent<Text>().text = optionText;
         newCityOption.GetComponent<CityOption>().setClickMethod(methodToAdd,arg);
         newCityOption.transform.SetParent(transform.GetChild(1), true);
-        newCityOption.GetComponent<RectTransform>().anchoredPosition = new Vector3(90, -15f + (-30 * amountOfOptions));
+        newCityOption.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, gameObject.GetComponent<RectTransform>().rect.height/2 - 15 + (-30 * amountOfOptions));
         amountOfOptions++;
+    }
+
+    void test(string empty)
+    {
+        Debug.Log(empty);
     }
 
 }

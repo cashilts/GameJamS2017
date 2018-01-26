@@ -24,6 +24,7 @@ public class FileSelect : MonoBehaviour {
 
     public void loadDirectoryOptions(string directory)
     {
+        if (optionHolder == null) optionHolder = transform.Find("OptionHolder").gameObject;
         for (int i = 0; i < optionHolder.transform.childCount; i++)
         {
             Destroy(optionHolder.transform.GetChild(i).gameObject);
@@ -35,7 +36,8 @@ public class FileSelect : MonoBehaviour {
         prevDir.transform.SetParent(optionHolder.transform, false);
         prevDir.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -15 - usedHeight);
         usedHeight += 30;
-        prevDir.transform.Find("Text").GetComponent<Text>().text = directory.Substring(0, directory.LastIndexOf('\\'));
+        prevDir.transform.Find("Text").GetComponent<Text>().text = "..";
+        prevDir.GetComponent<FileOption>().setOption(directory.Substring(0, directory.LastIndexOf('\\')));
         prevDir.GetComponent<FileOption>().setOptionType = FileOption.optionType.DIRECTORY;
 
         string[] directoriesInDir = System.IO.Directory.GetDirectories(directory);
@@ -45,7 +47,8 @@ public class FileSelect : MonoBehaviour {
             newOption.transform.SetParent(optionHolder.transform, false);
             newOption.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -15 - usedHeight);
             usedHeight += 30;
-            newOption.transform.Find("Text").GetComponent<Text>().text = directoriesInDir[i];
+            newOption.transform.Find("Text").GetComponent<Text>().text = directoriesInDir[i].Substring(directoriesInDir[i].LastIndexOf('\\'), directoriesInDir[i].Length - directoriesInDir[i].LastIndexOf('\\'));
+            newOption.GetComponent<FileOption>().setOption(directoriesInDir[i]);
             newOption.GetComponent<FileOption>().setOptionType = FileOption.optionType.DIRECTORY;
         }
 
@@ -59,17 +62,19 @@ public class FileSelect : MonoBehaviour {
                 newOption.transform.SetParent(optionHolder.transform, false);
                 newOption.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -15 - usedHeight);
                 usedHeight += 30;
-                newOption.transform.Find("Text").GetComponent<Text>().text = filesInDir[i];
+                newOption.GetComponent<FileOption>().setOption(filesInDir[i]);
+                newOption.transform.Find("Text").GetComponent<Text>().text = filesInDir[i].Substring(filesInDir[i].LastIndexOf('\\')+1, filesInDir[i].Length - filesInDir[i].LastIndexOf('\\')-1);
                 newOption.GetComponent<FileOption>().setOptionType = FileOption.optionType.SAVEFILE;
             }
         }
-
-        transform.Find("Scrollbar").GetComponent<Scrollbar>().size = ((200f / usedHeight) > 1 ? 1 : (200f / usedHeight));
+        optionHolder.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, usedHeight);
+        optionHolder.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, - (usedHeight/2));
+        transform.Find("Scrollbar").GetComponent<Scrollbar>().size = ((GetComponent<RectTransform>().rect.height / usedHeight) > 1 ? 1 : (GetComponent<RectTransform>().rect.height / usedHeight));
     }
 
     public void scrollBarMoved()
     {
-        optionHolder.GetComponent<RectTransform>().anchoredPosition = new Vector2(0,(usedHeight - 200) * (transform.Find("Scrollbar").GetComponent<Scrollbar>().value));
+        optionHolder.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, (-(usedHeight/2)) + ((GetComponent<RectTransform>().rect.height) * (transform.Find("Scrollbar").GetComponent<Scrollbar>().value)));
     }
 
     public void selectFile(string filename)

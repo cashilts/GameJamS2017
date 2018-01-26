@@ -7,6 +7,7 @@ public class Player : MonoBehaviour {
     public int gold = 100;
     public int GPT = 0;
     public bool aiPlayer = false;
+    public int id;
     public Color playerColor;
     public Material playerOccupiedTile;
 

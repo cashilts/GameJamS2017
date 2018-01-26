@@ -1,0 +1,4 @@
+-More terrain generation
+-Camera object base instance for platform neutrality
+-Buildings in city
+-Better camera control
