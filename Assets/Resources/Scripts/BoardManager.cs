@@ -117,39 +117,34 @@ public class BoardManager : Singleton<BoardManager> {
     /// <param name="fileName">Filename of a valid XML save</param>
     public void loadBoardState(string fileName)
     {
+        initBoard();
+
         XmlDocument doc = new XmlDocument();
         doc.Load(fileName);
-        XmlNode headOfDoc = doc.FirstChild;
-        for(int i = 0; i<boardSize; i++)
-        {
-            XmlNode row = headOfDoc.ChildNodes[i];
-            for(int j = 0; j<boardSize; j++)
-            {
+        XmlNode gameNode = doc.FirstChild;
+        XmlNode focusNode = gameNode.FirstChild;
 
-                XmlNode tile = row.ChildNodes[j];
-                board[i,j].setType = (Tile.tileType)Tile.typeNames.IndexOf(tile.Attributes.GetNamedItem("type").InnerText);
-                if (board[i, j].setType == Tile.tileType.DeepWater) {
-                    board[i, j].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/PlainTexture");
-                }
-                else if(board[i,j].setType == Tile.tileType.Grass)
-                {
-                    board[i, j].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/GrassTex");
-                }
-                else if(board[i,j].setType == Tile.tileType.Ice)
-                {
-                    board[i, j].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/IceTex");
-                }
-                else if(board[i,j].setType == Tile.tileType.ShallowWater)
-                {
-                    board[i, j].GetComponent<MeshRenderer>().material = (Material)Resources.Load("Models/Materials/SWater");
-                }
-                board[i, j].wealth = System.Convert.ToInt32(tile.Attributes.GetNamedItem("wealth").InnerText);
-                board[i, j].food = System.Convert.ToInt32(tile.Attributes.GetNamedItem("food").InnerText);
-                
+        CameraController.Instance.loadCamera(focusNode);
+        focusNode = focusNode.NextSibling;
+
+        GameManager.Instance.loadState(focusNode);
+        focusNode = focusNode.NextSibling;
+        for(int i = 0; i<GameManager.Instance.numPlayers; i++)
+        {
+            GameManager.Instance.getPlayer(i).loadPlayer(focusNode);
+            focusNode = focusNode.NextSibling;
+        }
+        XmlNode tileNode = focusNode.FirstChild;
+        for (int i = 0; i < boardSize; i++)
+        {
+            for (int j = 0; j < boardSize; j++)
+            {
+                board[i, j].loadTile(tileNode);
+                tileNode = tileNode.NextSibling;
             }
         }
-        GameObject.Find("Mini").GetComponent<MiniMap>().generateMiniMap();
     }
+    
 
     /// <summary>
     /// Saves board state into an XML file
@@ -168,6 +163,15 @@ public class BoardManager : Singleton<BoardManager> {
         XmlDocument doc = new XmlDocument();
         XmlElement game = doc.CreateElement("Game");
         game.AppendChild(CameraController.Instance.saveCamera(ref doc));
+        game.AppendChild(GameManager.Instance.saveState(ref doc));
+
+        Player[] allPlayers = GameObject.FindObjectsOfType<Player>();
+        foreach(Player p in allPlayers)
+        {
+            game.AppendChild(p.savePlayer(ref doc));
+        }
+
+        
 
         XmlElement boardElement = doc.CreateElement("Board");
         for(int i = 0; i < boardSize; i++)
@@ -188,6 +192,14 @@ public class BoardManager : Singleton<BoardManager> {
     /// Generates two ice poles on the top and bottom of the map
     /// </summary>
     public void GenerateIcePoles()
+    {
+        int iceX = (int)Random.Range(0.4f * boardSize, 0.6f * boardSize);
+        GenerateIce(iceX, 0, 100);
+        iceX = (int)Random.Range(0.4f * boardSize, 0.6f * boardSize);
+        GenerateIce(iceX, boardSize - 1, 100);
+    }
+
+    public void initBoard()
     {
         float startX = (boardSize / 2) * tileWidth * -1;
         float startY = (boardSize / 2) * tileHeight * -1;
@@ -210,10 +222,6 @@ public class BoardManager : Singleton<BoardManager> {
                 startX += tileWidth / 2;
             }
         }
-        int iceX = (int)Random.Range(0.4f * boardSize, 0.6f * boardSize);
-        GenerateIce(iceX, 0, 100);
-        iceX = (int)Random.Range(0.4f * boardSize, 0.6f * boardSize);
-        GenerateIce(iceX, boardSize - 1, 100);
     }
 
 

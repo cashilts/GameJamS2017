@@ -70,6 +70,7 @@ public class FileSelect : MonoBehaviour {
         optionHolder.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, usedHeight);
         optionHolder.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, - (usedHeight/2));
         transform.Find("Scrollbar").GetComponent<Scrollbar>().size = ((GetComponent<RectTransform>().rect.height / usedHeight) > 1 ? 1 : (GetComponent<RectTransform>().rect.height / usedHeight));
+        transform.Find("Scrollbar").GetComponent<Scrollbar>().value = 0;
     }
 
     public void scrollBarMoved()

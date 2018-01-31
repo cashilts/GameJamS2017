@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
@@ -167,7 +168,7 @@ public class CameraControllerPC : CameraController {
                 GameObject fileSelect = Instantiate((GameObject)Resources.Load("Prefabs/FileSelect"));
                 fileSelect.name = "FileSelect";
                 fileSelect.transform.SetParent(GameObject.Find("Canvas").transform, false);
-                FileSelect.fileSubmit submitCallback = new FileSelect.fileSubmit(GameObject.Find("BoardGenerator").GetComponent<BoardManager>().loadBoardState);
+                FileSelect.fileSubmit submitCallback = new FileSelect.fileSubmit(BoardManager.Instance.loadBoardState);
                 fileSelect.GetComponent<FileSelect>().setFileSelectFunction(submitCallback);
                 fileSelect.GetComponent<FileSelect>().loadDirectoryOptions(System.IO.Directory.GetCurrentDirectory());
                 changeMode(inputModes.TEXTENTRY);
@@ -211,5 +212,15 @@ public class CameraControllerPC : CameraController {
         cameraElement.SetAttribute("YPos", transform.position.y.ToString());
         cameraElement.SetAttribute("ZPos", transform.position.z.ToString());
         return cameraElement;
+    }
+
+    public override void loadCamera(XmlNode camera)
+    {
+        XmlAttributeCollection cameraAttributes = camera.Attributes;
+
+        float x = Convert.ToSingle(cameraAttributes.GetNamedItem("XPos"));
+        float y = Convert.ToSingle(cameraAttributes.GetNamedItem("YPos"));
+        float z = Convert.ToSingle(cameraAttributes.GetNamedItem("ZPos"));
+        transform.position = new Vector3(x, y, z);
     }
 }

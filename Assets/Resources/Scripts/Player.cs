@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
@@ -56,5 +58,22 @@ public class Player : MonoBehaviour {
     public void giveCity(City city)
     {
         ownedCities.Add(city);
+    }
+
+    public XmlElement savePlayer(ref XmlDocument doc)
+    {
+        XmlElement playerElement = doc.CreateElement("Player");
+        playerElement.SetAttribute("Gold", gold.ToString());
+        playerElement.SetAttribute("GPT", GPT.ToString());
+        playerElement.SetAttribute("id", GPT.ToString());
+        return playerElement;
+    }
+
+    public void loadPlayer(XmlNode playerNode)
+    {
+        XmlAttributeCollection playerElements = playerNode.Attributes;
+        gold = Convert.ToInt32(playerElements.GetNamedItem("Gold").Value);
+        GPT = Convert.ToInt32(playerElements.GetNamedItem("GPT").Value);
+        id = Convert.ToInt32(playerElements.GetNamedItem("id").Value);
     }
 }

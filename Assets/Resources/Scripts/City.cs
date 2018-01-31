@@ -23,7 +23,6 @@ public class City : BoardObject {
         for (int i = 0; i < 3; i++)
         {
             int houseModel = Random.Range(1, NUMMODELS+1);
-            Debug.Log(houseModel);
             GameObject house = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Models/house"+houseModel.ToString()));
             house.transform.SetPositionAndRotation(new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-2f, 0f)), house.transform.rotation);
             house.transform.SetParent(transform, false);
@@ -126,5 +125,10 @@ public class City : BoardObject {
         }
         tileElement.SetAttribute("Owner", owner.id.ToString());
         return tileElement;
+    }
+
+    public void loadCity(XmlNode cityNode)
+    {
+
     }
 }

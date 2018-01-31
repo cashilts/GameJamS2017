@@ -202,4 +202,9 @@ public abstract class Unit : BoardObject {
         XmlElement unit = doc.CreateElement("Unit");
         return unit;
     }
+
+    public virtual void loadUnit(XmlNode unitNode)
+    {
+
+    }
 }

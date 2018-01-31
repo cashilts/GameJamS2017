@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml;
@@ -215,9 +216,18 @@ public class Tile : MonoBehaviour {
         {
             tileElement.SetAttribute("Owner", owner.id.ToString());
         }
+        else
+        {
+            tileElement.SetAttribute("Owner", "-1");
+        }
         if (cityOnTile)
         {
+            tileElement.SetAttribute("City", true.ToString());
             tileElement.AppendChild(cityOnTile.saveCity(ref doc));
+        }
+        else
+        {
+            tileElement.SetAttribute("City", false.ToString());
         }
        
 
@@ -228,5 +238,66 @@ public class Tile : MonoBehaviour {
 
         return tileElement;
     }
+
+    public void loadTile(XmlNode tileNode)
+    {
+        XmlAttributeCollection tileAttributes = tileNode.Attributes;
+
+        setType = (tileType)typeNames.IndexOf(tileAttributes.GetNamedItem("type").Value);
+        wealth = Convert.ToInt32(tileAttributes.GetNamedItem("wealth").Value);
+        food = Convert.ToInt32(tileAttributes.GetNamedItem("food").Value);
+        int waterMask = Convert.ToInt32(tileAttributes.GetNamedItem("RiverOnTile").Value);
+        for(int i = 0; i<6; i++)
+        {
+            bool water = Convert.ToBoolean(waterMask % 2);
+            waterDirections[5 - i] = water;
+            if (water) hasWater = true;
+            waterMask = waterMask >> 1;
+        }
+        int ownerId = Convert.ToInt32(tileAttributes.GetNamedItem("Owner").Value);
+        if (ownerId != -1)
+        {
+            owner = GameObject.Find("Player" + ownerId).GetComponent<Player>();
+        }
+        XmlNode tileChildren = tileNode.FirstChild;
+        bool city = Convert.ToBoolean(tileAttributes.GetNamedItem("City").Value);
+        if (city)
+        {
+            GameObject newCity = Instantiate(Resources.Load<GameObject>("Prefabs/City"));
+            newCity.transform.SetParent(transform, false);
+            cityOnTile = newCity.GetComponent<City>();
+            cityOnTile.loadCity(tileChildren);
+            owner.giveCity(cityOnTile);
+            tileChildren = tileChildren.NextSibling;
+        }
+
+        while(tileChildren != null)
+        {
+            string unitType = tileChildren.Name;
+            GameObject newUnit = (GameObject)Instantiate(Resources.Load("Prefabs/" + unitType));
+            newUnit.GetComponent<Unit>().loadUnit(tileChildren);
+            tileChildren = tileChildren.NextSibling;
+        }
+        updateTileGraphics();
+    }
+
+    void updateTileGraphics()
+    {
+        List<Material> materials = new List<Material>();
+
+        if (setType == tileType.Ice) materials.Add(Resources.Load<Material>("Models/Materials/IceTex"));
+        else if (setType == tileType.DeepWater) materials.Add(Resources.Load<Material>("Models/Materials/PlainTex"));
+        else if (setType == tileType.ShallowWater) materials.Add(Resources.Load<Material>("Models/Materials/SWater"));
+        else if (setType == tileType.Grass) materials.Add(Resources.Load<Material>("Models/Materials/GrassTex"));
+
+        if(owner != null)
+        {
+            materials.Add(owner.playerOccupiedTile);
+        }
+        GetComponent<MeshRenderer>().materials = materials.ToArray();
+        if (hasWater) getWaterTexture();
+    }
+
+
 
 }

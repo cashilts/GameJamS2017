@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
@@ -174,5 +175,16 @@ public class Boat : Unit {
         newElement.SetAttribute("health", health.ToString());
         newElement.SetAttribute("Owner", owner.id.ToString());
         return newElement;
+    }
+
+    public override void loadUnit(XmlNode unitNode)
+    {
+        XmlAttributeCollection unitAttribs = unitNode.Attributes;
+        speed = Convert.ToInt32(unitAttribs.GetNamedItem("speed").Value);
+        health = Convert.ToInt32(unitAttribs.GetNamedItem("health").Value);
+        int ownerId = Convert.ToInt32(unitAttribs.GetNamedItem("Owner").Value);
+        owner = GameObject.Find("Player" + ownerId).GetComponent<Player>();
+        owner.giveUnit(this);
+        //transform.Find("Cube").GetComponent<MeshRenderer>().materials[0].SetColor("_Color", owner.playerColor);
     }
 }
